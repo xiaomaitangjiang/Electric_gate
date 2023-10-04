@@ -58,7 +58,7 @@ void SystemClock_Config(void);
 
 double V=0,C=0,P=0,E_con=0;
 volatile int dataReceived = 0;
-int leakage=0,cross=0,cross_C=0;
+int leakage=0,cross=0,cross_C=0,cross_S=0;
 uint16_t errorcode=0x000;
 uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V,double * C,double * P,double * E_con);
 uint16_t currentMenuIndex=0,time_close=0,time_on=0,enter=0,enter_storage=0,time_storage=0;
@@ -83,13 +83,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				time++;
         if (time == time_close*65)
 				{
-					cross=0;
+					cross_C=0;
 					time_close=0;
 					time=0;
 				}
         if(time == time_on*65)
 				{
-					cross=1;
+					cross_C=1;
 					time_on=0;
 					time=0;
 				}
@@ -123,7 +123,7 @@ if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6) == GPIO_PIN_SET)
 {
   // PA0 is low
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
-	ms_Delay(3);
+	ms_Delay(1);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
 }
 
@@ -141,7 +141,7 @@ if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15) == GPIO_PIN_RESET)
 //control
 void control(void)
 {
-if(cross==1||cross_C==1)
+if(cross==1||cross_C==1||cross_S==1)
 	{
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
 	}
@@ -393,7 +393,7 @@ HAL_TIM_Base_Start_IT(&htim2);
 //safety funtion
 if(V>=V_set)
 {
-  cross=0;
+  cross_S=0;
 	errorcode=0x008|errorcode;
 	control();
 	
@@ -401,27 +401,27 @@ if(V>=V_set)
 
 if(C>=C_set)
 {
-  cross=0;
+  cross_S=0;
 	errorcode=0x010|errorcode;
 	control();
 }
 
 if(P>=P_set)
 {
-  cross=0;
+  cross_S=0;
 	errorcode=0x020|errorcode;
 	control();
 }
 
 if(E_con>=E_con_set)
 {
-  cross=0;
+  cross_S=0;
 	errorcode=0x040|errorcode;
 	control();
 }
 if(V-22>V_storage)
 {
-	cross=0;
+	cross_S=0;
 	errorcode=0x080|errorcode;
 	control();
 }
@@ -509,14 +509,14 @@ if(P_storage>P_set)
 							}
 							if(currentMenuIndex==0)
 							{
-								if(cross_C==0)
+								if(cross_S==0)
 								{
-									cross_C=1;
+									cross_S=1;
 									enter=0;
 								}
-								else if(cross_C==1)
+								else if(cross_S==1)
 								{
-									cross_C=0;
+									cross_S=0;
 									enter=0;
 								}
 								
@@ -726,7 +726,7 @@ if(P_storage>P_set)
 					if(currentMenuIndex_storage!=currentMenuIndex ||lineindex_storage!=lineindex||data!=V_set+C_set+P_set+time_close+time_on||enter_storage!=enter)
 					{
 						
-	          page0(currentMenuIndex,cross_C);
+	          page0(currentMenuIndex,cross_S);
             page1(currentMenuIndex,lineindex,enter);
 						if(currentMenuIndex_storage!=currentMenuIndex)//页面切换后使行数归1
 						{
@@ -745,8 +745,7 @@ if(P_storage>P_set)
 					lineindex_storage=lineindex;
 					data=V_set+C_set+P_set+time_close+time_on;
 					enter_storage=enter;
-					if(cross==0)
-					{cross_C=0;}
+					
 
 			
 			
