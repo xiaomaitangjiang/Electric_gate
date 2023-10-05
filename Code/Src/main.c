@@ -284,6 +284,21 @@ void page3(int index)
 	if (index==3)
 	{
 		OLED_Clear();	
+		OLED_ShowCHinese(0,0,32,0);//错
+	  OLED_ShowCHinese(12,0,35,0);//误
+		OLED_ShowCHinese(24,0,27,0);//:
+		OLED_ShowCHinese(0,3,41,0);//漏
+		OLED_ShowCHinese(12,3,0,0);//电
+		
+		
+	}
+}
+
+void page4(int index)
+{
+	if (index==3)
+	{
+		OLED_Clear();	
 		OLED_DrawBMP(0,0,45,7,gImage_1,0);
 		OLED_ShowCHinese(48,0,11,0);//开
 	  OLED_ShowCHinese(60,0,12,0);//发
@@ -307,9 +322,10 @@ void page3(int index)
 menu m[]=
 {
 	{0,0,1,3,1},//主页
-	{1,1,3,0,1},//定时
-	{2,1,4,1,1},//安全设置
-	{3,0,0,2,0},//关于
+	{1,1,2,0,1},//定时
+	{2,1,3,1,1},//安全设置
+	{3,0,2,4,0},//故障显示
+	{4,0,0,3,0},//关于
 };
 
 
@@ -450,7 +466,7 @@ if(P_storage>P_set)
 				{
 					// 处理按键事件
         if (key1State == GPIO_PIN_RESET || key2State == GPIO_PIN_RESET || key4State == GPIO_PIN_RESET || key3State == GPIO_PIN_RESET ) {
-            ms_Delay(15); // 消抖延时
+            ms_Delay(25); // 消抖延时
 
             if (key1State == GPIO_PIN_RESET) {
                 currentMenuIndex = m[currentMenuIndex].left; // 向左选择
@@ -502,6 +518,7 @@ if(P_storage>P_set)
 				{
 					if (key4State == GPIO_PIN_RESET)//取消选择操作
 							{
+								ms_Delay(10); // 消抖延时
 								enter = 0;
 								while (key4State == GPIO_PIN_RESET) {
                     key4State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY4连接到GPIOB的11引脚
@@ -509,6 +526,7 @@ if(P_storage>P_set)
 							}
 							if(currentMenuIndex==0)
 							{
+								ms_Delay(10); // 消抖延时
 								if(cross_S==0)
 								{
 									cross_S=1;
@@ -527,6 +545,7 @@ if(P_storage>P_set)
 						{
 							if(key1State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								time_close--;
 							  while(key1State == GPIO_PIN_RESET)
 							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
@@ -534,6 +553,7 @@ if(P_storage>P_set)
 							
 							if(key2State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								time_close++;
 							  while(key2State == GPIO_PIN_RESET)
 							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
@@ -541,6 +561,7 @@ if(P_storage>P_set)
 							
 							if(key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								time_close=time_close+10;
 							  while(key3State == GPIO_PIN_RESET)
 							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
@@ -548,6 +569,7 @@ if(P_storage>P_set)
 							
 							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								time_close=time_close-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
@@ -565,6 +587,7 @@ if(P_storage>P_set)
 							
 							if(key1State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								time_on--;
 							  while(key1State == GPIO_PIN_RESET)
 							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
@@ -572,6 +595,7 @@ if(P_storage>P_set)
 							
 							if(key2State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								time_on++;
 							  while(key2State == GPIO_PIN_RESET)
 							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
@@ -579,6 +603,7 @@ if(P_storage>P_set)
 							
 							if(key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								time_on=time_on+10;
 							  while(key3State == GPIO_PIN_RESET)
 							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
@@ -586,6 +611,7 @@ if(P_storage>P_set)
 							
 							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								time_on=time_on-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
@@ -607,6 +633,7 @@ if(P_storage>P_set)
 						{
 							if(key1State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								V_set--;
 							  while(key1State == GPIO_PIN_RESET)
 							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
@@ -614,6 +641,7 @@ if(P_storage>P_set)
 							
 							if(key2State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								V_set++;
 							  while(key2State == GPIO_PIN_RESET)
 							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
@@ -621,6 +649,7 @@ if(P_storage>P_set)
 							
 							if(key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								V_set=V_set+10;
 							  while(key3State == GPIO_PIN_RESET)
 							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
@@ -628,6 +657,7 @@ if(P_storage>P_set)
 							
 							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								V_set=V_set-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
@@ -643,6 +673,7 @@ if(P_storage>P_set)
 							
 							if(key1State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								C_set--;
 							  while(key1State == GPIO_PIN_RESET)
 							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
@@ -650,6 +681,7 @@ if(P_storage>P_set)
 							
 							if(key2State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								C_set++;
 							  while(key2State == GPIO_PIN_RESET)
 							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
@@ -657,6 +689,7 @@ if(P_storage>P_set)
 							
 							if(key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								C_set=C_set+10;
 							  while(key3State == GPIO_PIN_RESET)
 							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
@@ -664,6 +697,7 @@ if(P_storage>P_set)
 							
 							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								C_set=C_set-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
@@ -680,6 +714,7 @@ if(P_storage>P_set)
 							
 							if(key1State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								P_set--;
 							  while(key1State == GPIO_PIN_RESET)
 							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
@@ -687,6 +722,7 @@ if(P_storage>P_set)
 							
 							if(key2State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								P_set++;
 							  while(key2State == GPIO_PIN_RESET)
 							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
@@ -694,6 +730,7 @@ if(P_storage>P_set)
 							
 							if(key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								P_set=P_set+10;
 							  while(key3State == GPIO_PIN_RESET)
 							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
@@ -701,6 +738,7 @@ if(P_storage>P_set)
 							
 							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
 							{
+								ms_Delay(10); // 消抖延时
 								P_set=P_set-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
@@ -738,6 +776,7 @@ if(P_storage>P_set)
 						lineindex=1;
 						}
 						page3(currentMenuIndex);
+						page4(currentMenuIndex);
 						
           }
 				
