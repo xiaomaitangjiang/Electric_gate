@@ -64,6 +64,11 @@ uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V,double * C,doub
 uint16_t currentMenuIndex=0,time_close=0,time_on=0,enter=0,enter_storage=0,time_storage=0;
 uint16_t V_set=0,C_set=0,P_set=0,E_con_set=0;
 int time=0;
+int RH=0,T=0,T1=0;
+int caring=0;
+float HZ=0;
+
+
 
 void ms_Delay(uint16_t t_ms)
 {
@@ -122,9 +127,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6) == GPIO_PIN_SET)
 {
   // PA0 is low
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
-	ms_Delay(1);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
+	cross=1;
 }
 
 //Leakage detection
@@ -144,6 +147,8 @@ void control(void)
 if(cross==1||cross_C==1||cross_S==1)
 	{
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
+		ms_Delay(1);
+		cross=0;
 	}
 	else
 	{
@@ -284,19 +289,23 @@ void page3(int index)
 	if (index==3)
 	{
 		OLED_Clear();	
-		OLED_ShowCHinese(0,0,32,0);//错
-	  OLED_ShowCHinese(12,0,35,0);//误
-		OLED_ShowCHinese(24,0,27,0);//:
-		OLED_ShowCHinese(0,3,41,0);//漏
-		OLED_ShowCHinese(12,3,0,0);//电
+		OLED_ShowCHinese(0,0,0,0);//电
+	  OLED_ShowCHinese(12,0,43,0);//路
+		OLED_ShowCHinese(24,0,52,0);//频
+	  OLED_ShowCHinese(36,0,53,0);//率
 		
+		OLED_ShowCHinese(0,3,32,0);//错
+	  OLED_ShowCHinese(12,3,35,0);//误
+		OLED_ShowCHinese(24,3,27,0);//:
+		
+		OLED_ShowNum(86,0,HZ,3,12,0);/*频率*/
 		
 	}
 }
 
-void page4(int index)
+void page5(int index)
 {
-	if (index==3)
+	if (index==5)
 	{
 		OLED_Clear();	
 		OLED_DrawBMP(0,0,45,7,gImage_1,0);
@@ -313,7 +322,29 @@ void page4(int index)
 	}
 }
 
-			
+	void page4(int index)
+{
+	
+	
+	if(index==4)
+	{
+	OLED_Clear();	
+	OLED_ShowCHinese(13,0,47,0);//温
+	OLED_ShowCHinese(25,0,48,0);//度
+		
+	OLED_ShowCHinese(13,2,49,0);//湿
+	OLED_ShowCHinese(25,2,48,0);//度
+		
+	OLED_ShowCHinese(13,4,50,0);//结
+	OLED_ShowCHinese(25,4,51,0);//露
+	OLED_ShowCHinese(37,4,47,0);//温
+	OLED_ShowCHinese(49,4,48,0);//度	
+	OLED_ShowNum(86,0,RH,5,12,0);/*湿度*/
+	OLED_ShowNum(86,2,T,5,12,0);/*温度*/
+	OLED_ShowNum(86,4,T1,2,12,0);	/*结露温度*/
+
+	}
+}		
 
 
 
@@ -321,11 +352,12 @@ void page4(int index)
 //page,line,left,right,enter
 menu m[]=
 {
-	{0,0,1,3,1},//主页
+	{0,0,1,5,1},//主页
 	{1,1,2,0,1},//定时
 	{2,1,3,1,1},//安全设置
-	{3,0,2,4,0},//故障显示
-	{4,0,0,3,0},//关于
+	{3,0,4,2,0},//故障显示
+	{4,0,5,3,0},//温度，湿度，露点显示
+	{5,0,0,4,0},//关于
 };
 
 
@@ -369,7 +401,7 @@ int main(void)
   MX_DMA_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
-  //MX_IWDG_Init();
+  MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
 	OLED_Init();
@@ -391,7 +423,7 @@ HAL_TIM_Base_Start_IT(&htim2);
     /* USER CODE END WHILE */
 
 //iwdg refresh
-//HAL_IWDG_Refresh(&hiwdg);
+HAL_IWDG_Refresh(&hiwdg);
 
  
 //data of HLW8032
@@ -443,25 +475,50 @@ if(V-22>V_storage)
 }
 if(P_storage>P_set)
 {
-	cross=0;
+	cross_S=0;
   errorcode=0x100|errorcode;
 	control();
 }
 
+//异常警告
+if(errorcode!=0)
+{HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);}
 
 //OLED
 
 
 
 // 读取按键状态
-        GPIO_PinState key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11); // KEY1
-        GPIO_PinState key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY2
-        GPIO_PinState key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1); // KEY3
-        GPIO_PinState key4State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY3
+        GPIO_PinState key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY1 left
+        GPIO_PinState key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY2  right
+        GPIO_PinState key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1); // KEY3  enter
+        GPIO_PinState key4State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12); // KEY4  line
 
 	
+if (caring==0&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET )
+{
+	ms_Delay(10);
+	caring=1;	
+	while (key1State == GPIO_PIN_RESET || key2State == GPIO_PIN_RESET  || key3State == GPIO_PIN_RESET)
+	{
+   key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY1
+   key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY2
+   key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1); // KEY3
 
+	}
+}
+else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  && key3State == GPIO_PIN_RESET )
+{
+	ms_Delay(10);
+	caring=0;
+	while (key1State == GPIO_PIN_RESET || key2State == GPIO_PIN_RESET || key3State == GPIO_PIN_RESET)
+	{
+   key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY1
+   key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY2
+   key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1); // KEY3
 
+	}
+}
         if(enter==0)
 				{
 					// 处理按键事件
@@ -471,7 +528,7 @@ if(P_storage>P_set)
             if (key1State == GPIO_PIN_RESET) {
                 currentMenuIndex = m[currentMenuIndex].left; // 向左选择
                 while (key1State == GPIO_PIN_RESET) {
-                    key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11); // KEY1连接到GPIOA的7引脚
+                    key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY1连接到GPIOA的7引脚
                 }
 							
             }
@@ -479,7 +536,7 @@ if(P_storage>P_set)
             if (key2State == GPIO_PIN_RESET) {
                 currentMenuIndex = m[currentMenuIndex].right; // 向右选择
                 while (key2State == GPIO_PIN_RESET) {
-                    key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY2连接到GPIOB的0引脚
+                    key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY2连接到GPIOB的0引脚
                 }
             }
 
@@ -503,7 +560,7 @@ if(P_storage>P_set)
 						if (key4State == GPIO_PIN_RESET) {
                 enter = m[currentMenuIndex].enter; // 确认
                 while (key4State == GPIO_PIN_RESET) {
-                    key4State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY4连接到GPIOB的11引脚
+                    key4State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12); // KEY4连接到GPIOB的11引脚
                 }
             }
 						
@@ -521,20 +578,20 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								enter = 0;
 								while (key4State == GPIO_PIN_RESET) {
-                    key4State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY4连接到GPIOB的11引脚
+                    key4State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12); // KEY4连接到GPIOB的11引脚
 								}
 							}
 							if(currentMenuIndex==0)
 							{
 								ms_Delay(10); // 消抖延时
-								if(cross_S==0)
+								if(cross_C==0)
 								{
-									cross_S=1;
+									cross_C=1;
 									enter=0;
 								}
-								else if(cross_S==1)
+								else if(cross_C==1)
 								{
-									cross_S=0;
+									cross_C=0;
 									enter=0;
 								}
 								
@@ -548,7 +605,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								time_close--;
 							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
+							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
 							}
 							
 							if(key2State == GPIO_PIN_RESET)
@@ -556,7 +613,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								time_close++;
 							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
+							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
 							}
 							
 							if(key3State == GPIO_PIN_RESET)
@@ -573,7 +630,7 @@ if(P_storage>P_set)
 								time_close=time_close-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11);
+									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
 								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
 								}
 							}
@@ -590,7 +647,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								time_on--;
 							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
+							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
 							}
 							
 							if(key2State == GPIO_PIN_RESET)
@@ -598,7 +655,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								time_on++;
 							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
+							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
 							}
 							
 							if(key3State == GPIO_PIN_RESET)
@@ -615,7 +672,7 @@ if(P_storage>P_set)
 								time_on=time_on-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11);
+									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
 								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
 								}
 							}
@@ -636,7 +693,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								V_set--;
 							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
+							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
 							}
 							
 							if(key2State == GPIO_PIN_RESET)
@@ -644,7 +701,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								V_set++;
 							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
+							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
 							}
 							
 							if(key3State == GPIO_PIN_RESET)
@@ -661,7 +718,7 @@ if(P_storage>P_set)
 								V_set=V_set-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11);
+									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
 								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
 								}
 							}
@@ -676,7 +733,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								C_set--;
 							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
+							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
 							}
 							
 							if(key2State == GPIO_PIN_RESET)
@@ -684,7 +741,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								C_set++;
 							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
+							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
 							}
 							
 							if(key3State == GPIO_PIN_RESET)
@@ -701,7 +758,7 @@ if(P_storage>P_set)
 								C_set=C_set-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11);
+									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
 								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
 								}
 							}
@@ -717,7 +774,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								P_set--;
 							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
+							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
 							}
 							
 							if(key2State == GPIO_PIN_RESET)
@@ -725,7 +782,7 @@ if(P_storage>P_set)
 								ms_Delay(10); // 消抖延时
 								P_set++;
 							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
+							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
 							}
 							
 							if(key3State == GPIO_PIN_RESET)
@@ -742,7 +799,7 @@ if(P_storage>P_set)
 								P_set=P_set-10;
 							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
 							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_11);
+									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
 								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
 								}
 							}
@@ -757,28 +814,57 @@ if(P_storage>P_set)
 				
 				
 				}
+				if(lineindex>2)
+				{
+					if(currentMenuIndex==1)
+					{lineindex=1;}
+					if(currentMenuIndex==2&&lineindex>3)
+					{lineindex=1;}
+				}
+				if(caring==1)
+					{
+					    if(currentMenuIndex>4&&currentMenuIndex_storage==4)
+							  {currentMenuIndex=0;}
+							else if (currentMenuIndex>4&&currentMenuIndex_storage==0)
+							  {currentMenuIndex=4;}
+							if(currentMenuIndex==2&&currentMenuIndex_storage==1)
+								{
+									currentMenuIndex=3;
+							  }
+							else if(currentMenuIndex==2&&currentMenuIndex_storage==3)
+								{
+									currentMenuIndex=1;
+							  }
+					}
 				
-				
-				
-				  
+				  if(currentMenuIndex_storage!=currentMenuIndex)//页面切换后使行数归1
+						{
+						lineindex=1;
+						}
 					if(currentMenuIndex_storage!=currentMenuIndex ||lineindex_storage!=lineindex||data!=V_set+C_set+P_set+time_close+time_on||enter_storage!=enter)
 					{
-						
-	          page0(currentMenuIndex,cross_S);
+						ms_Delay(1);
+						if(caring==0)
+						{
+	          page0(currentMenuIndex,cross_C);
             page1(currentMenuIndex,lineindex,enter);
-						if(currentMenuIndex_storage!=currentMenuIndex)//页面切换后使行数归1
-						{
-						lineindex=1;
-						}
 	          page2(currentMenuIndex,lineindex,enter);
-						if(currentMenuIndex_storage!=currentMenuIndex)//页面切换后使行数归1
-						{
-						lineindex=1;
-						}
 						page3(currentMenuIndex);
 						page4(currentMenuIndex);
-						
+						page5(currentMenuIndex);
+					  }
+						else if (caring==1)
+						{
+							 page0(currentMenuIndex,cross_C);
+               page1(currentMenuIndex,lineindex,enter);
+							 page3(currentMenuIndex);
+							 page4(currentMenuIndex);
+							
+							
+							
+						}
           }
+					
 				
 				  currentMenuIndex_storage=currentMenuIndex;
 					lineindex_storage=lineindex;
