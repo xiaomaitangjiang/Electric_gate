@@ -66,8 +66,8 @@ uint16_t V_set=0,C_set=0,P_set=0,E_con_set=0;
 int time=0;
 int RH=0,T=0,T1=0;
 int caring=0;
-float HZ=0;
-int time_h=0,t=50;
+float HZ=0,HZ_S=1;
+int time_h=0,t=0;
 
 
 
@@ -111,9 +111,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if (htim->Instance== htim3.Instance)
 		{
 			time_h++;
-			if (time_h==100)
+			if (time_h==2)
 			{
 				HZ=(float)(t/time_h);
+				ms_Delay(1);
 				t=0;
 				time_h=0;
 			}
@@ -139,6 +140,7 @@ if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6) == GPIO_PIN_SET)
 {
   // PA0 is low
 	cross=1;
+	t++;
 }
 
 //Leakage detection
@@ -309,8 +311,10 @@ void page3(int index)
 	  OLED_ShowCHinese(12,3,35,0);//误
 		OLED_ShowCHinese(24,3,27,0);//:
 		
-		OLED_ShowNum(86,0,HZ,3,12,0);/*频率*/
 		
+		
+		/*频率*/
+		OLED_ShowNum(86,0,(int)HZ,2,12,0);
 	}
 }
 
@@ -413,7 +417,7 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
 	MX_TIM3_Init();
-  MX_IWDG_Init();
+ // MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
 	OLED_Init();
@@ -425,12 +429,8 @@ uint16_t V_storage=0,P_storage=0;
 HAL_UART_Receive_DMA(&huart2, rxBuffer, sizeof(rxBuffer));
 uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
 
-
+/*使能定时器1中断*/
 HAL_TIM_Base_Start_IT(&htim2);
-    /*使能定时器1中断*/
-HAL_TIM_Base_Start_IT(&htim3);
-HAL_TIM_Base_Start_IT(&htim2);
-    /*使能定时器1中断*/
 HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
 
@@ -441,7 +441,7 @@ HAL_TIM_Base_Start_IT(&htim3);
     /* USER CODE END WHILE */
 
 //iwdg refresh
-HAL_IWDG_Refresh(&hiwdg);
+//HAL_IWDG_Refresh(&hiwdg);
 
  
 //data of HLW8032
@@ -851,7 +851,7 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 						{
 						lineindex=1;
 						}
-					if(currentMenuIndex_storage!=currentMenuIndex ||lineindex_storage!=lineindex||data!=V_set+C_set+P_set+time_close+time_on||enter_storage!=enter)
+					if(currentMenuIndex_storage!=currentMenuIndex ||lineindex_storage!=lineindex||data!=V_set+C_set+P_set+time_close+time_on||enter_storage!=enter||HZ_S!=HZ)
 					{
 						ms_Delay(1);
 						if(caring==0)
@@ -880,7 +880,7 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 					lineindex_storage=lineindex;
 					data=V_set+C_set+P_set+time_close+time_on;
 					enter_storage=enter;
-					
+					HZ_S=HZ;
 
 			
 			
