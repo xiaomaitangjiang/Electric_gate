@@ -61,12 +61,13 @@ volatile int dataReceived = 0;
 int leakage=0,cross=0,cross_C=0,cross_S=0;
 uint16_t errorcode=0x000;
 uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V,double * C,double * P,double * E_con);
-uint16_t currentMenuIndex=0,time_close=0,time_on=0,enter=0,enter_storage=0,time_storage=0;
+uint16_t currentMenuIndex=2,time_close=0,time_on=1,enter=0,enter_storage=0,time_storage=0;
 uint16_t V_set=0,C_set=0,P_set=0,E_con_set=0;
 int time=0;
 int RH=0,T=0,T1=0;
 int caring=0;
 float HZ=0;
+int time_h=0,t=50;
 
 
 
@@ -79,8 +80,8 @@ void ms_Delay(uint16_t t_ms)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    
-    if (htim == (&htim2))
+    time++;
+    if (htim->Instance== htim2.Instance)
     {
 			
 			if(time_close+time_on!=0)
@@ -107,6 +108,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			}
         
     }
+		if (htim->Instance== htim3.Instance)
+		{
+			time_h++;
+			if (time_h==100)
+			{
+				HZ=(float)(t/time_h);
+				t=0;
+				time_h=0;
+			}
+		}
 }
 
 
@@ -401,6 +412,7 @@ int main(void)
   MX_DMA_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
+	MX_TIM3_Init();
   MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
@@ -413,7 +425,13 @@ uint16_t V_storage=0,P_storage=0;
 HAL_UART_Receive_DMA(&huart2, rxBuffer, sizeof(rxBuffer));
 uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
 
+
 HAL_TIM_Base_Start_IT(&htim2);
+    /*使能定时器1中断*/
+HAL_TIM_Base_Start_IT(&htim3);
+HAL_TIM_Base_Start_IT(&htim2);
+    /*使能定时器1中断*/
+HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -545,16 +563,7 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 							while (key3State == GPIO_PIN_RESET) {
                     key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
 							lineindex=m[currentMenuIndex].line++;
-							if(currentMenuIndex==2 && lineindex>2)
-							{
-								m[currentMenuIndex].line=1;
-								lineindex=1;
-							}
-							if(currentMenuIndex==3 && lineindex>3)
-							{
-								m[currentMenuIndex].line=1;
-								lineindex=1;
-							}
+				
 						}
 					 
 						if (key4State == GPIO_PIN_RESET) {
@@ -814,12 +823,13 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 				
 				
 				}
+				lineindex=m[currentMenuIndex].line;
 				if(lineindex>2)
 				{
 					if(currentMenuIndex==1)
-					{lineindex=1;}
+					{m[currentMenuIndex].line=1;}
 					if(currentMenuIndex==2&&lineindex>3)
-					{lineindex=1;}
+					{m[currentMenuIndex].line=1;}
 				}
 				if(caring==1)
 					{
