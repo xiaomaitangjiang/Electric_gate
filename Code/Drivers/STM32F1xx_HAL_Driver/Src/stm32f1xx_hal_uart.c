@@ -2362,6 +2362,16 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
       UART_Receive_IT(huart);
       return;
     }
+		if(((isrflags & USART_SR_IDLE) != 0U) && ((cr1its & USART_CR1_IDLEIE) != 0U))
+    {	
+    //当中断类型为空闲中断
+    __HAL_UART_DISABLE_IT(huart,UART_IT_IDLE);    	//关了空闲中断
+    HAL_UART_IdleCpltCallback(huart);				//调用空闲中断回调函数
+    __HAL_UART_CLEAR_IDLEFLAG(huart);				//清除IDLE标志
+    __HAL_UART_ENABLE_IT(huart,UART_IT_IDLE);    	//使能空闲中断
+
+    return;
+    }
   }
 
   /* If some errors occur */
@@ -2618,10 +2628,25 @@ __weak void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)
   */
 __weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	
   /* Prevent unused argument(s) compilation warning */
   UNUSED(huart);
   /* NOTE: This function should not be modified, when the callback is needed,
            the HAL_UART_RxCpltCallback could be implemented in the user file
+   */
+}
+/**
+  * @brief  Rx Transfer idle callback.
+  * @param  huart UART handle.
+  * @retval None
+  */
+__weak void HAL_UART_IdleCpltCallback(UART_HandleTypeDef *huart)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(huart);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_UART_IdleCpltCallback can be implemented in the user file.
    */
 }
 

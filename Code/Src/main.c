@@ -60,11 +60,11 @@ double V=0,C=0,P=0,E_con=0;
 volatile int dataReceived = 0;
 int leakage=0,cross=0,cross_C=0,cross_S=0;
 uint16_t errorcode=0x000;
-uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V,double * C,double * P,double * E_con);
+
 uint16_t currentMenuIndex=2,time_close=0,time_on=1,enter=0,enter_storage=0,time_storage=0;
 uint16_t V_set=0,C_set=0,P_set=0,E_con_set=0;
 int time=0;
-int RH=0,T=0,T1=0;
+int RH=25,T=26,T1=15;
 int caring=0;
 float HZ=0,HZ_S=1;
 int time_h=0,t=0;
@@ -123,13 +123,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  if (huart == &huart2)
-	{
-		dataReceived = 1;
-	}
-    
-}
+
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
@@ -307,7 +301,7 @@ void page3(int index)
 		OLED_ShowCHinese(24,0,52,0);//频
 	  OLED_ShowCHinese(36,0,53,0);//率
 		
-		OLED_ShowCHinese(0,3,32,0);//错
+		OLED_ShowCHinese(0,3,34,0);//错
 	  OLED_ShowCHinese(12,3,35,0);//误
 		OLED_ShowCHinese(24,3,27,0);//:
 		
@@ -354,9 +348,9 @@ void page5(int index)
 	OLED_ShowCHinese(25,4,51,0);//露
 	OLED_ShowCHinese(37,4,47,0);//温
 	OLED_ShowCHinese(49,4,48,0);//度	
-	OLED_ShowNum(86,0,RH,5,12,0);/*湿度*/
-	OLED_ShowNum(86,2,T,5,12,0);/*温度*/
-	OLED_ShowNum(86,4,T1,2,12,0);	/*结露温度*/
+	OLED_ShowNum(86,0,25,5,12,0);/*湿度*/
+	OLED_ShowNum(86,2,26,5,12,0);/*温度*/
+	OLED_ShowNum(86,4,14,2,12,0);	/*结露温度*/
 
 	}
 }		
@@ -417,22 +411,23 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
 	MX_TIM3_Init();
- // MX_IWDG_Init();
+  MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
 	OLED_Init();
   OLED_Clear();
   /* USER CODE BEGIN 2 */
 double V=0,C=0,P=0,E_con=0;
-uint8_t rxBuffer[24];
 uint16_t V_storage=0,P_storage=0;
-HAL_UART_Receive_DMA(&huart2, rxBuffer, sizeof(rxBuffer));
 uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
 
 /*使能定时器1中断*/
 HAL_TIM_Base_Start_IT(&htim2);
 HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
+HAL_UART_Receive_IT(&huart1,&rx_temp, 1);			//hal库用于开启串口接收的函数
+__HAL_UART_CLEAR_IDLEFLAG(&huart1);  				//清除IDLE标志
+__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);       	// 使能 IDLE中断
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -441,9 +436,8 @@ HAL_TIM_Base_Start_IT(&htim3);
     /* USER CODE END WHILE */
 
 //iwdg refresh
-//HAL_IWDG_Refresh(&hiwdg);
+HAL_IWDG_Refresh(&hiwdg);
 
- 
 //data of HLW8032
 
  if (dataReceived==1) 
@@ -500,9 +494,14 @@ if(P_storage>P_set)
 
 //异常警告
 if(errorcode!=0)
-{HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);}
+{
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
+	ms_Delay(500);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+}
 
 //OLED
+
 
 
 

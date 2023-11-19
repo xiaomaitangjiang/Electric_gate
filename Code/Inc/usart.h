@@ -42,7 +42,12 @@ extern UART_HandleTypeDef huart2;
 
 void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
+uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V1,double * C1,double * P1,double * E_con1);
 
+extern volatile int dataReceived;
+extern uint8_t rxBuffer[24];
+extern uint8_t rx_temp;
+extern uint8_t rx_len;
 /* USER CODE BEGIN Prototypes */
 
 /* USER CODE END Prototypes */
