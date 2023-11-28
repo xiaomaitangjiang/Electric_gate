@@ -269,7 +269,7 @@ EXTI15_10_IRQHandler
 RTC_Alarm_IRQHandler
 USBWakeUp_IRQHandler
 
-                B       .       
+                B       .
 
                 ENDP
 

@@ -18,13 +18,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "dma.h"
 #include "i2c.h"
 #include "iwdg.h"
+#include "rtc.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 #include "oled.h"
+#include <cstring>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -55,21 +58,18 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
 double V=0,C=0,P=0,E_con=0;
-volatile int dataReceived = 0;
 int leakage=0,cross=0,cross_C=0,cross_S=0;
 uint16_t errorcode=0x000;
-
 uint16_t currentMenuIndex=2,time_close=0,time_on=1,enter=0,enter_storage=0,time_storage=0;
 uint16_t V_set=0,C_set=0,P_set=0,E_con_set=0;
 int time=0;
-int RH=25,T=26,T1=15;
+int RH=0,T=0,T1=0;
 int caring=0;
 float HZ=0,HZ_S=1;
 int time_h=0,t=0;
-
-
+uint8_t rxBuffer[24],receive[50];
+uint16_t V_storage=0,P_storage=0;
 
 void ms_Delay(uint16_t t_ms)
 {
@@ -162,6 +162,32 @@ if(cross==1||cross_C==1||cross_S==1)
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
 	}
 }
+
+
+//hlw8032 uart receive
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+	if(huart==&huart1)
+	{
+		for(uint16_t i=0;i<=Size;i++)
+		{
+			if (Size>(sizeof(rxBuffer)))
+			{
+				memset(receive,0,50);
+			break;}
+			rxBuffer[i]=receive[i];
+			
+		}
+		//存储上次有效电流、功率数据
+		 V_storage=V , P_storage=P;
+		 errorcode = HLW8032_Data_processing(receive,&V,&C,&P,&E_con);
+	   //V 电压,C 电流,P 功率,E_con 度
+		HAL_UARTEx_ReceiveToIdle_IT(&huart1,receive,24);
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+		memset(receive,0,50);
+	}
+}
+
 
 typedef struct 
 {
@@ -368,9 +394,6 @@ menu m[]=
 	{4,0,5,3,0},//温度，湿度，露点显示
 	{5,0,0,4,0},//关于
 };
-
-
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -383,10 +406,9 @@ menu m[]=
   * @retval int
   */
 int main(void)
-
 {
   /* USER CODE BEGIN 1 */
-
+uint32_t ADC_RV;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -409,45 +431,41 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_I2C1_Init();
-  MX_TIM2_Init();
-	MX_TIM3_Init();
-  MX_IWDG_Init();
+ // MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
+  MX_TIM2_Init();
+  MX_RTC_Init();
+  MX_I2C2_Init();
+  MX_TIM3_Init();
+  MX_ADC1_Init();
+	
 	OLED_Init();
   OLED_Clear();
   /* USER CODE BEGIN 2 */
-double V=0,C=0,P=0,E_con=0;
-uint16_t V_storage=0,P_storage=0;
-uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
-
-/*使能定时器1中断*/
-HAL_TIM_Base_Start_IT(&htim2);
-HAL_TIM_Base_Start_IT(&htim3);
+  uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
+	
+  /*使能定时器1中断*/
+  HAL_TIM_Base_Start_IT(&htim2);
+  HAL_TIM_Base_Start_IT(&htim3);
+	
+	HAL_ADCEx_Calibration_Start(&hadc1);
+	ms_Delay(10);
+	HAL_ADC_Start_DMA(&hadc1,&ADC_RV,240);
+	
+	
   /* USER CODE END 2 */
-HAL_UART_Receive_IT(&huart1,&rx_temp, 1);			//hal库用于开启串口接收的函数
-__HAL_UART_CLEAR_IDLEFLAG(&huart1);  				//清除IDLE标志
-__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);       	// 使能 IDLE中断
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while(1)
+  while (1)
   {
     /* USER CODE END WHILE */
-
-//iwdg refresh
-HAL_IWDG_Refresh(&hiwdg);
-
-//data of HLW8032
-
- if (dataReceived==1) 
-	 {
-		 //存储上次有效电流、功率数据
-		 V_storage=V , P_storage=P;
-		 errorcode = HLW8032_Data_processing(rxBuffer,&V,&C,&P,&E_con);
-	   //V 电压,C 电流,P 功率,E_con 度
-		 dataReceived = 0;
-   }
+		//iwdg refresh
+//HAL_IWDG_Refresh(&hiwdg);
+ms_Delay(50);
+HAL_UARTEx_ReceiveToIdle_IT(&huart1,receive,24);
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
 
 
 //safety funtion
@@ -491,15 +509,15 @@ if(P_storage>P_set)
   errorcode=0x100|errorcode;
 	control();
 }
-
+/*
 //异常警告
 if(errorcode!=0)
 {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
-	ms_Delay(500);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
 }
-
+else 
+{HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);}
+*/
 //OLED
 
 
@@ -881,27 +899,10 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 					enter_storage=enter;
 					HZ_S=HZ;
 
-			
-			
-			
-
-
-
-			
-				
-		}
-
-
-
-
-
-
-
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
-
+}
 
 /**
   * @brief System Clock Configuration
@@ -911,13 +912,16 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE
+                              |RCC_OSCILLATORTYPE_LSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -938,6 +942,13 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_ADC;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
