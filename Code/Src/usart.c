@@ -21,7 +21,6 @@
 #include "usart.h"
 #include <cstring>
 /* USER CODE BEGIN 0 */
-extern uint8_t rxBuffer[24];
 uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V1,double * C1,double * P1,double * E_con1)
 {
 	uint32_t VP_REG=0,V_REG=0,CP_REG=0,C_REG=0,PP_REG=0,P_REG=0,PF_COUNT=0,PF=0,dat_sum=0;
@@ -70,7 +69,6 @@ uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V1,double * C1,do
 			PF=(k*65536)+(rxBuffer1[21]*256)+rxBuffer1[22];//计算已用电量脉冲数
 			PF_COUNT= 3600000000000/(PP_REG*3.006);//计算1度电对应的脉冲数量
 			*E_con1=((PF*10000)/PF_COUNT)/10000.0;//计算已用电量
-			memset(rxBuffer,0,24);//清空缓存
 		}	
 	}
 	//屏幕驱动函数

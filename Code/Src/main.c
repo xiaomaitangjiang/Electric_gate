@@ -68,8 +68,21 @@ int RH=0,T=0,T1=0;
 int caring=0;
 float HZ=0,HZ_S=1;
 int time_h=0,t=0;
-uint8_t rxBuffer[24],receive[50];
+uint8_t receive[50];
 uint16_t V_storage=0,P_storage=0;
+uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
+uint32_t ADC_RV[3]={0};
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance ==USART1)
+	{
+		__HAL_UNLOCK(&huart1);
+		HAL_UARTEx_ReceiveToIdle_IT(&huart1,receive,sizeof(receive));
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+	}
+}
+
 
 void ms_Delay(uint16_t t_ms)
 {
@@ -169,22 +182,13 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
 	if(huart==&huart1)
 	{
-		for(uint16_t i=0;i<=Size;i++)
-		{
-			if (Size>(sizeof(rxBuffer)))
-			{
-				memset(receive,0,50);
-			break;}
-			rxBuffer[i]=receive[i];
-			
-		}
 		//存储上次有效电流、功率数据
 		 V_storage=V , P_storage=P;
 		 errorcode = HLW8032_Data_processing(receive,&V,&C,&P,&E_con);
 	   //V 电压,C 电流,P 功率,E_con 度
-		HAL_UARTEx_ReceiveToIdle_IT(&huart1,receive,24);
+		memset(receive,0,sizeof(receive));
+		HAL_UARTEx_ReceiveToIdle_IT(&huart1,receive,sizeof(receive));
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
-		memset(receive,0,50);
 	}
 }
 
@@ -408,7 +412,7 @@ menu m[]=
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-uint32_t ADC_RV;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -443,16 +447,17 @@ uint32_t ADC_RV;
 	OLED_Init();
   OLED_Clear();
   /* USER CODE BEGIN 2 */
-  uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
-	
+  
   /*使能定时器1中断*/
   HAL_TIM_Base_Start_IT(&htim2);
   HAL_TIM_Base_Start_IT(&htim3);
 	
 	HAL_ADCEx_Calibration_Start(&hadc1);
 	ms_Delay(10);
-	HAL_ADC_Start_DMA(&hadc1,&ADC_RV,240);
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,3);
 	
+	HAL_UARTEx_ReceiveToIdle_IT(&huart1,receive,sizeof(receive));
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
 	
   /* USER CODE END 2 */
 
@@ -463,9 +468,7 @@ uint32_t ADC_RV;
     /* USER CODE END WHILE */
 		//iwdg refresh
 //HAL_IWDG_Refresh(&hiwdg);
-ms_Delay(50);
-HAL_UARTEx_ReceiveToIdle_IT(&huart1,receive,24);
-	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+
 
 
 //safety funtion
