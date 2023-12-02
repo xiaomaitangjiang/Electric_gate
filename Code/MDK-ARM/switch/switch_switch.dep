@@ -37,9 +37,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x64ACDD82)
 I (..\oled\oledfont.h)(0x6564BA1E)
-F (..\oled\oledfont.c)(0x656AE14E)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\oledfont.o --omf_browse switch\oledfont.crf --depend switch\oledfont.d)
+F (..\oled\oledfont.c)(0x656B20AB)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\oledfont.o --omf_browse switch\oledfont.crf --depend switch\oledfont.d)
 I (..\oled\oledfont.h)(0x6564BA1E)
-F (../Src/main.c)(0x656AFF38)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\main.o --omf_browse switch\main.crf --depend switch\main.d)
+F (../Src/main.c)(0x656B2ADE)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\main.o --omf_browse switch\main.crf --depend switch\main.d)
 I (../Inc/main.h)(0x6569F6B9)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x64ACDD82)
 I (../Inc/stm32f1xx_hal_conf.h)(0x6566E041)
@@ -86,7 +86,7 @@ I (../oled/oled.h)(0x65655109)
 I (../oled/oledfont.h)(0x6564BA1E)
 I (D:\Keil_v5\ARM\ARMCC\include\cstring)(0x5D9AD21A)
 I (D:\Keil_v5\ARM\ARMCC\include\string.h)(0x5D9AD218)
-F (../Src/gpio.c)(0x6569F629)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\gpio.o --omf_browse switch\gpio.crf --depend switch\gpio.d)
+F (../Src/gpio.c)(0x656B107A)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\gpio.o --omf_browse switch\gpio.crf --depend switch\gpio.d)
 I (../Inc/gpio.h)(0x6564BBF3)
 I (../Inc/main.h)(0x6569F6B9)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x64ACDD82)
@@ -122,7 +122,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x64ACDD82)
-F (../Src/adc.c)(0x6568B2BA)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\adc.o --omf_browse switch\adc.crf --depend switch\adc.d)
+F (../Src/adc.c)(0x656B107A)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\adc.o --omf_browse switch\adc.crf --depend switch\adc.d)
 I (../Inc/adc.h)(0x6566E041)
 I (../Inc/main.h)(0x6569F6B9)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x64ACDD82)
@@ -194,7 +194,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x64ACDD82)
-F (../Src/i2c.c)(0x65675CAC)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\i2c.o --omf_browse switch\i2c.crf --depend switch\i2c.d)
+F (../Src/i2c.c)(0x656B12B2)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\i2c.o --omf_browse switch\i2c.crf --depend switch\i2c.d)
 I (../Inc/i2c.h)(0x6566E041)
 I (../Inc/main.h)(0x6569F6B9)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x64ACDD82)
@@ -338,7 +338,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x64ACDD82)
-F (../Src/usart.c)(0x6568B2BE)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\usart.o --omf_browse switch\usart.crf --depend switch\usart.d)
+F (../Src/usart.c)(0x656B107A)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\usart.o --omf_browse switch\usart.crf --depend switch\usart.d)
 I (../Inc/usart.h)(0x6566E9B8)
 I (../Inc/main.h)(0x6569F6B9)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x64ACDD82)
@@ -374,7 +374,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x64ACDD82)
-F (../Src/stm32f1xx_it.c)(0x6569F62F)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\stm32f1xx_it.o --omf_browse switch\stm32f1xx_it.crf --depend switch\stm32f1xx_it.d)
+F (../Src/stm32f1xx_it.c)(0x656B107A)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\stm32f1xx_it.o --omf_browse switch\stm32f1xx_it.crf --depend switch\stm32f1xx_it.d)
 I (../Inc/main.h)(0x6569F6B9)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x64ACDD82)
 I (../Inc/stm32f1xx_hal_conf.h)(0x6566E041)
@@ -409,7 +409,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x64ACDD82)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x64ACDD82)
-I (../Inc/stm32f1xx_it.h)(0x6569F62F)
+I (../Inc/stm32f1xx_it.h)(0x656B1079)
 F (../Src/stm32f1xx_hal_msp.c)(0x6564BBFA)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../control -I ../oled-I.\RTE\_switch-ID:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-ID:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\1.1.0\Device\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o switch\stm32f1xx_hal_msp.o --omf_browse switch\stm32f1xx_hal_msp.crf --depend switch\stm32f1xx_hal_msp.d)
 I (../Inc/main.h)(0x6569F6B9)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x64ACDD82)

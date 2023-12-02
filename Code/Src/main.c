@@ -70,7 +70,7 @@ float HZ=0,HZ_S=1;
 int time_h=0,t=0;
 uint8_t rxBuffer[24],receive[50];
 uint16_t V_storage=0,P_storage=0;
-uint32_t ADC_RV[300]={0};
+uint32_t ADC_RV[30]={0};
 int type;
 
 
@@ -101,6 +101,8 @@ uint8_t errorprocessing (uint16_t errortype,uint16_t * index)
 		if((errortype&0x100)!=0)
 		{type1=9;}
 	}
+	else if(errortype==0)
+	{HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);}
 	
 	return type1;
 }
@@ -169,6 +171,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 
 
+//control
+void control(void)
+{
+if(cross==1||cross_C==1||cross_S==1)
+	{
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		ms_Delay(1);
+		cross=0;
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+	}
+}
 
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -194,20 +210,6 @@ if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15) == GPIO_PIN_RESET)
   
 }
 
-//control
-void control(void)
-{
-if(cross==1||cross_C==1||cross_S==1)
-	{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-		ms_Delay(1);
-		cross=0;
-	}
-	else
-	{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-	}
-}
 
 
 //hlw8032 uart receive
@@ -359,14 +361,6 @@ void page3(int index,int type)
 	if (index==3)
 	{
 		OLED_Clear();	
-		OLED_ShowCHinese(0,0,0,0);//电
-	  OLED_ShowCHinese(12,0,43,0);//路
-		OLED_ShowCHinese(24,0,52,0);//频
-	  OLED_ShowCHinese(36,0,53,0);//率
-		
-		OLED_ShowCHinese(0,3,34,0);//错
-	  OLED_ShowCHinese(12,3,35,0);//误
-		OLED_ShowCHinese(24,3,27,0);//:
 		switch(type)
 		{
 			case 1:
@@ -375,6 +369,7 @@ void page3(int index,int type)
 				OLED_ShowCHinese(24,6,56,0);//器
 				OLED_ShowCHinese(36,6,34,0);//错
 			  OLED_ShowCHinese(48,6,35,0);//误
+			  OLED_ShowCHinese(60,6,67,0);//清除符
 			break;
 			case 2:
 				OLED_ShowCHinese(0,6,57,0);//误
@@ -389,18 +384,24 @@ void page3(int index,int type)
 				OLED_ShowCHinese(12,6,1,0);//压
 				OLED_ShowCHinese(24,6,45,0);//过
 				OLED_ShowCHinese(36,6,39,0);//大
+			  OLED_ShowCHinese(48,6,67,0);//清除符
+			  OLED_ShowCHinese(60,6,67,0);//清除符
 			break;
 			case 5:
 				OLED_ShowCHinese(0,6,0,0);//电
 				OLED_ShowCHinese(12,6,2,0);//流
 				OLED_ShowCHinese(24,6,45,0);//过
 				OLED_ShowCHinese(36,6,39,0);//大
+			  OLED_ShowCHinese(48,6,67,0);//清除符
+			  OLED_ShowCHinese(60,6,67,0);//清除符
 			break;
 			case 6:
 				OLED_ShowCHinese(0,6,3,0);//功
 				OLED_ShowCHinese(12,6,4,0);//率
 				OLED_ShowCHinese(24,6,45,0);//过
 				OLED_ShowCHinese(36,6,39,0);//大
+			  OLED_ShowCHinese(48,6,67,0);//清除符
+			  OLED_ShowCHinese(60,6,67,0);//清除符
 			break;
 			case 7:
 				OLED_ShowCHinese(0,6,65,0);//达
@@ -412,17 +413,36 @@ void page3(int index,int type)
 			case 9:
 				OLED_ShowCHinese(0,6,45,0);//过
 				OLED_ShowCHinese(12,6,64,0);//载
+			  OLED_ShowCHinese(24,6,67,0);//清除符
+			  OLED_ShowCHinese(36,6,67,0);//清除符
+			  OLED_ShowCHinese(48,6,67,0);//清除符
+			  OLED_ShowCHinese(60,6,67,0);//清除符
 			break;
 			case 8:
 				OLED_ShowCHinese(0,6,42,0);//短
 				OLED_ShowCHinese(12,6,43,0);//路
+			  OLED_ShowCHinese(24,6,67,0);//清除符
+			  OLED_ShowCHinese(36,6,67,0);//清除符
+			  OLED_ShowCHinese(48,6,67,0);//清除符
+			  OLED_ShowCHinese(60,6,67,0);//清除符
 			break;
 			case 3:
 				OLED_ShowCHinese(0,6,41,0);//漏
 				OLED_ShowCHinese(12,6,0,0);//电
+			  OLED_ShowCHinese(24,6,67,0);//清除符
+			  OLED_ShowCHinese(36,6,67,0);//清除符
+			  OLED_ShowCHinese(48,6,67,0);//清除符
+			  OLED_ShowCHinese(60,6,67,0);//清除符
 			break;
 		}
+		OLED_ShowCHinese(0,0,0,0);//电
+	  OLED_ShowCHinese(12,0,43,0);//路
+		OLED_ShowCHinese(24,0,52,0);//频
+	  OLED_ShowCHinese(36,0,53,0);//率
 		
+		OLED_ShowCHinese(0,3,34,0);//错
+	  OLED_ShowCHinese(12,3,35,0);//误
+		OLED_ShowCHinese(24,3,27,0);//:
 		
 		/*频率*/
 		OLED_ShowNum(86,0,(int)HZ,2,12,0);
@@ -527,9 +547,11 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   MX_RTC_Init();
- // MX_I2C2_Init();
+  MX_I2C2_Init();
   MX_TIM3_Init();
   MX_ADC1_Init();
+	OLED_Init();
+	OLED_Clear();
   /* USER CODE BEGIN 2 */
   uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
 	
@@ -539,7 +561,7 @@ int main(void)
 	
 	HAL_ADCEx_Calibration_Start(&hadc1);
 	ms_Delay(10);
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,300);
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,30);
 	
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receive,24);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
@@ -552,10 +574,10 @@ int main(void)
     //iwdg refresh
 //HAL_IWDG_Refresh(&hiwdg);
 
+if(V==0)
+{errorcode = HLW8032_Data_processing(receive,&V,&C,&P,&E_con);}
+errorprocessing(errorcode,&currentMenuIndex);	
 		
-		
-		
-
 //safety funtion
 if(V>=V_set)
 {
@@ -957,7 +979,7 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 	          page0(currentMenuIndex,cross_C);
             page1(currentMenuIndex,lineindex,enter);
 	          page2(currentMenuIndex,lineindex,enter);
-						page3(currentMenuIndex,errorcode);
+						page3(currentMenuIndex,errorprocessing(errorcode,&currentMenuIndex));
 						page4(currentMenuIndex);
 						page5(currentMenuIndex);
 					  }
@@ -965,7 +987,7 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 						{
 							 page0(currentMenuIndex,cross_C);
                page1(currentMenuIndex,lineindex,enter);
-							 page3(currentMenuIndex,errorcode);
+							 page3(currentMenuIndex,errorprocessing(errorcode,&currentMenuIndex));
 							 page4(currentMenuIndex);
 							
 							
@@ -979,7 +1001,7 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 					data=V_set+C_set+P_set+time_close+time_on;
 					enter_storage=enter;
 					HZ_S=HZ;
-page0(currentMenuIndex,cross_C);
+					
   }
   /* USER CODE END 3 */
 }
