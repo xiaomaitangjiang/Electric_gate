@@ -35,5 +35,3 @@ switch\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
 switch\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 switch\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 switch\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-switch\usart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\cstring
-switch\usart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

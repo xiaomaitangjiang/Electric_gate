@@ -42,7 +42,7 @@ switch\main.o: ../Inc/rtc.h
 switch\main.o: ../Inc/tim.h
 switch\main.o: ../Inc/usart.h
 switch\main.o: ../Inc/gpio.h
-switch\main.o: ..\oled\oled.h
-switch\main.o: ..\oled\oledfont.h
+switch\main.o: ../oled/oled.h
+switch\main.o: ../oled/oledfont.h
 switch\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\cstring
 switch\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

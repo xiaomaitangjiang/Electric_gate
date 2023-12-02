@@ -1,5 +1,7 @@
 --cpu Cortex-M3
 "switch\startup_stm32f103xb.o"
+"switch\oled.o"
+"switch\oledfont.o"
 "switch\main.o"
 "switch\gpio.o"
 "switch\adc.o"
@@ -11,8 +13,6 @@
 "switch\usart.o"
 "switch\stm32f1xx_it.o"
 "switch\stm32f1xx_hal_msp.o"
-"switch\oled.o"
-"switch\oledfont.o"
 "switch\stm32f1xx_hal_gpio_ex.o"
 "switch\stm32f1xx_hal_adc.o"
 "switch\stm32f1xx_hal_adc_ex.o"
