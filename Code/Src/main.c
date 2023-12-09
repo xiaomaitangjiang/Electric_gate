@@ -72,6 +72,13 @@ uint8_t rxBuffer[24],receive[50];
 uint16_t V_storage=0,P_storage=0;
 uint32_t ADC_RV[30]={0};
 int type;
+int adc_RH,adc_T,adc_V;
+
+
+void adc_data_processing (uint32_t adc_data[])
+{
+	
+}
 
 
 //Òì³£¾¯¸æ
@@ -571,11 +578,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+		
     //iwdg refresh
 //HAL_IWDG_Refresh(&hiwdg);
 
-if(V==0)
-{errorcode = HLW8032_Data_processing(receive,&V,&C,&P,&E_con);}
 errorprocessing(errorcode,&currentMenuIndex);	
 		
 //safety funtion
@@ -583,9 +589,10 @@ if(V>=V_set)
 {
   cross_S=0;
 	errorcode=0x008|errorcode;
-	control();
-	
+	control();	
 }
+else if(0x008&errorcode)
+{errorcode=0x008^errorcode;}
 
 if(C>=C_set)
 {
@@ -593,6 +600,8 @@ if(C>=C_set)
 	errorcode=0x010|errorcode;
 	control();
 }
+else if(0x010&errorcode)
+{errorcode=0x010^errorcode;}
 
 if(P>=P_set)
 {
@@ -600,6 +609,8 @@ if(P>=P_set)
 	errorcode=0x020|errorcode;
 	control();
 }
+else if(0x020&errorcode)
+{errorcode=0x020^errorcode;}
 
 if(E_con>=E_con_set)
 {
@@ -607,19 +618,24 @@ if(E_con>=E_con_set)
 	errorcode=0x040|errorcode;
 	control();
 }
+else if(0x040&errorcode)
+{errorcode=0x040^errorcode;}
 if(V-22>V_storage)
 {
 	cross_S=0;
 	errorcode=0x080|errorcode;
 	control();
 }
+else if(0x080&errorcode)
+{errorcode=0x080^errorcode;}
 if(P_storage>P_set)
 {
 	cross_S=0;
   errorcode=0x100|errorcode;
 	control();
 }
-
+else if(0x100&errorcode)
+{errorcode=0x100^errorcode;}
 
 //OLED
 
