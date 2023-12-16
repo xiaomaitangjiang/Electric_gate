@@ -2,6 +2,7 @@
 "switch\startup_stm32f103xb.o"
 "switch\oled.o"
 "switch\oledfont.o"
+"switch\process.o"
 "switch\main.o"
 "switch\gpio.o"
 "switch\adc.o"
