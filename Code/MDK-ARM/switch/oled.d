@@ -7,14 +7,14 @@ switch\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h
 switch\oled.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h
 switch\oled.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h
 switch\oled.o: ../Drivers/CMSIS/Include/core_cm3.h
-switch\oled.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+switch\oled.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 switch\oled.o: ../Drivers/CMSIS/Include/cmsis_version.h
 switch\oled.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 switch\oled.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 switch\oled.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h
 switch\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 switch\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-switch\oled.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+switch\oled.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 switch\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h
 switch\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h
 switch\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h
