@@ -49,37 +49,46 @@ void expandinit (int initmode)
 	{
 		//开漏下拉，低电平
 		//默认无输出模式
-		GPIO_InitStruct.Pin = GPIO_Init;
+		GPIO_InitStruct.Pin = GPIO_Init_P;
 		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
 		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);
-		HAL_GPIO_WritePin(GPIO_Init_type, GPIO_Init, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIO_Init_type, GPIO_Init_P, GPIO_PIN_RESET);
 	}
 	else if(initmode==1)
 	{ //iic模式
-		GPIO_InitStruct.Pin = GPIO_Init;
+		GPIO_InitStruct.Pin = GPIO_Init_P;
 		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);
 		MX_I2C1_Init();
 	}
 	else if(initmode==2)
-	{//上升沿中断触发
-		GPIO_InitStruct.Pin = GPIO_Init;
+	{//uart模式
+		GPIO_InitStruct.Pin = GPIO_Init_P;
 		GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
 		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);
+		HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);//有问题，关于配置中断
+		HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 	}
 	else if(initmode==3)
 	{//下降沿中断触发
-		GPIO_InitStruct.Pin = GPIO_Init;
+		GPIO_InitStruct.Pin = GPIO_Init_P;
 		GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
 		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);
 	}
 	else if(initmode==4)
+	{//上升沿中断触发
+		GPIO_InitStruct.Pin = GPIO_Init_P;
+		GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);
+	}
+	else if(initmode==5)
 	{//上升下降中断触发
-		GPIO_InitStruct.Pin = GPIO_Init;
+		GPIO_InitStruct.Pin = GPIO_Init_P;
 		GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
 		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);

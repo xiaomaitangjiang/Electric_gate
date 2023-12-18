@@ -4,6 +4,7 @@
 #include "stm32f1xx_hal.h"
 #include "gpio.h"
 #include "time.h"
+#include "process.h"
 
 typedef enum{
 	STATE_START=0,

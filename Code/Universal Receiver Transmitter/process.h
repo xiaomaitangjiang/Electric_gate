@@ -7,7 +7,7 @@
 #include <string.h>
 #include "i2c.h"
 
-#define GPIO_Init GPIO_PIN_8|GPIO_PIN_9
+#define GPIO_Init_P GPIO_PIN_8|GPIO_PIN_9
 #define GPIO_Init_type GPIOB
 
 void UARTSOFT_RECEIVE(void);
