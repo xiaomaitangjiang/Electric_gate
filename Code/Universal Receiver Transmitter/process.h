@@ -9,10 +9,12 @@
 
 #define GPIO_Init_P GPIO_PIN_8|GPIO_PIN_9
 #define GPIO_Init_type GPIOB
-
+void empty(void);
 void UARTSOFT_RECEIVE(void);
 void IIC_RECEIVE(void);
 void SMBUS_RECEIVE(void);
+
+
 
 typedef struct 
 {	

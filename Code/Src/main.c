@@ -73,7 +73,15 @@ uint16_t V_storage=0,P_storage=0;
 uint32_t ADC_RV[30]={0};
 int type;
 int adc_RH,adc_T,adc_V;
+uint16_t set_us =0; 
 
+
+void delay_us(uint16_t us)
+{
+	set_us=us-1;
+	MX_TIM2_Init();
+	HAL_TIM_Base_Start_IT(&htim4);
+}
 
 void adc_data_processing (uint32_t adc_data[])
 {
@@ -173,6 +181,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				t=0;
 				time_h=0;
 			}
+		}
+		if (htim->Instance == htim4.Instance)
+		{
+			
 		}
 }
 

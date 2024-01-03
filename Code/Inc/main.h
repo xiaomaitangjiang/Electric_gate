@@ -54,7 +54,7 @@ extern DMA_HandleTypeDef hdma_usart1_rx;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void delay_us(uint16_t us);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

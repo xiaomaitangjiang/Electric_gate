@@ -37,3 +37,7 @@ switch\uartsoft.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 switch\uartsoft.o: ../Inc/gpio.h
 switch\uartsoft.o: ../Inc/main.h
 switch\uartsoft.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\time.h
+switch\uartsoft.o: ..\Universal Receiver Transmitter\process.h
+switch\uartsoft.o: ../oled/oledfont.h
+switch\uartsoft.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+switch\uartsoft.o: ../Inc/i2c.h
