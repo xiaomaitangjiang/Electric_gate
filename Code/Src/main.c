@@ -27,7 +27,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "oled.h"
-#include <cstring>
+#include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -92,7 +92,7 @@ void adc_data_processing (uint32_t adc_data[])
 //Òì³£¾¯¸æ
 uint8_t errorprocessing (uint16_t errortype,uint16_t * index)
 {
-	uint8_t type1=0;
+	/*uint8_t type1=0;
 	if(errortype!=0)
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
@@ -119,7 +119,8 @@ uint8_t errorprocessing (uint16_t errortype,uint16_t * index)
 	else if(errortype==0)
 	{HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);}
 	
-	return type1;
+	return type1;*/
+	return 0;
 }
 
 
@@ -134,6 +135,12 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 	}
 }
 
+void HAL_Delay(uint32_t Delay)
+{
+	uint32_t t=Delay*3127;
+	while(t--);
+	
+}
 void ms_Delay(uint16_t t_ms)
 {
 	uint32_t t=t_ms*3127;
@@ -578,9 +585,9 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
   HAL_TIM_Base_Start_IT(&htim3);
 	
-	HAL_ADCEx_Calibration_Start(&hadc1);
-	ms_Delay(10);
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,30);
+	//HAL_ADCEx_Calibration_Start(&hadc1);
+	//ms_Delay(10);
+	//HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,30);
 	
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receive,24);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
@@ -590,7 +597,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		
+		OLED_ShowNum(86,0,25,5,12,0);
+		ms_Delay(100);
     //iwdg refresh
 //HAL_IWDG_Refresh(&hiwdg);
 

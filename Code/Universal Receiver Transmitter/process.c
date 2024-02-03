@@ -4,53 +4,59 @@
 void empty(void)
 {}
 
-void IIC_RECEIVE(void)
+void communication::IIC_RECEIVE(void)
 {MX_I2C1_Init();}
 
-void UARTSOFT_RECEIVE(void)
+void communication::UARTSOFT_RECEIVE(void)
 {empty();}
 
-void SMBUS_RECEIVE(void)
+void communication::SMBUS_RECEIVE(void)
 {empty();}
-	
+
+
+communication::communication()
+{}
+communication::~communication()
+{}
+
 /**
  * @function: int modeprocessing (expand * data)
  * @description: 传输模式处理函数
  * @param {expand} 传入的expand数组
  * @return {unsigned int} result
  */
-void modeprocessing (expand * data)
+void communication::modeprocessing (expand * modedata)
 {
-	if(data->mode!=0)
+	if(modedata->mode!=0)
 	{
-		expandinit(data->mode);	
+		expandinit(modedata->mode);	
 	}
-	if(strcmp(&(data->TransmissionProtocols),"usart")==0)
+	if(modedata->Transmit==uart)
 	{
 		//uart传输函数
-		expandinit(data->mode);
+		expandinit(modedata->mode);
 		UARTSOFT_RECEIVE();
 	}
-	else if(strcmp(&(data->TransmissionProtocols),"i2c")==0)
+	else if(modedata->Transmit==iic)
 	{
 		//IIC
-		expandinit(data->mode);
+		expandinit(modedata->mode);
 		IIC_RECEIVE();
 	}
-	else if(strcmp(&(data->TransmissionProtocols),"smbus")==0)
+	else if(modedata->Transmit==smbus)
 	{
 		//SMBUS
-		expandinit(data->mode);
+		expandinit(modedata->mode);
 		SMBUS_RECEIVE();
 	}
-	else if(strcmp(&(data->TransmissionProtocols),"CAN")==0)
+	else if(modedata->Transmit==can)
 	{
 		//CAN总线
-		expandinit(data->mode);
+		expandinit(modedata->mode);
 		
 	}
 	else
-	{data->TransmissionProtocols=NULL;}
+	{modedata->Transmit=none;}
 }
 
 
@@ -60,7 +66,7 @@ void modeprocessing (expand * data)
  * @param {int} initmode通讯模式
  * @return {void} 
  */
-void expandinit (int initmode)
+void communication::expandinit (int initmode)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	if(initmode==0)
@@ -118,10 +124,65 @@ void expandinit (int initmode)
 
 
 
-uint32_t dataprocessing (uint8_t * data_IN[24])
+
+action* communication::bitprocess (int Bytein,action reaction[8])
 {
-	uint8_t data[24];
-	memcpy(data,data_IN,24);
-	if()
-	
+	enum bitcheck
+		{
+			bit0check=0b1,
+			bit1check=0b10,
+			bit2check=0b100,
+			bit3check=0b1000,
+			bit4check=0b10000,
+			bit5check=0b100000,
+			bit6check=0b1000000,
+			bit7check=0b10000000
+	  }bitchecker;
+		
+		
+		int actioncode=0;
+		int ParityCheckdata=0;
+		//奇偶校验
+		for (int bit=1;bit<=0b10000000;bit=bit<<1)
+		{
+			if ((Bytein&(bitchecker=bitcheck(bit)))==1)
+			{
+				ParityCheckdata++;
+			}
+		}
+		if(ParityCheckdata%2==0)
+		{ParityCheckdata=1;}
+		else
+		{ParityCheckdata=0;}
+		if(ParityCheckdata!=(Bytein&(bitchecker=bitcheck(0b1))))
+		{
+			reaction[0]=byteerror;
+		}
+		
+		//位检测
+		for (int bit=1,actionways=1,actionbit=0;bit<=0b10000000 && reaction[0]!=byteerror;bit=bit<<1,actionways++,actionbit++)
+		{
+			if ((Bytein&(bitchecker=bitcheck(bit)))==1)
+			{
+				reaction[actionbit]=action(actionways);
+			}
+		}
+		
+	return reaction;
 }
+
+
+	
+action* communication::dataprocessing (uint8_t * data_IN[5])
+{
+	uint8_t data[5];
+	memcpy(data,data_IN,5);
+	
+	int funtionswitchdata=data[1];
+	action *actionway;
+	actionway=bitprocess(funtionswitchdata,actionway);
+	
+	return actionway;
+}
+
+
