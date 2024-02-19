@@ -335,10 +335,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--cpp</MiscControls>
+              <MiscControls>--cpp11</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../oled;..\Universal Receiver Transmitter</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../oled;..\oled\menu;..\funtion of C++;..\Universal Receiver Transmitter</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -457,6 +457,11 @@
               <FileType>1</FileType>
               <FilePath>../Src/stm32f1xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\can.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -562,6 +567,11 @@
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f1xx_hal_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_can.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -571,6 +581,36 @@
               <FileName>system_stm32f1xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/system_stm32f1xx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>menu</GroupName>
+          <Files>
+            <File>
+              <FileName>menu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\oled\menu\menu.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>C++Funtion</GroupName>
+          <Files>
+            <File>
+              <FileName>funtions.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\funtion of C++\funtions.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>URTP</GroupName>
+          <Files>
+            <File>
+              <FileName>process.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Universal Receiver Transmitter\process.c</FilePath>
             </File>
           </Files>
         </Group>

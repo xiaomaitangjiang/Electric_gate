@@ -20,6 +20,7 @@ switch\stm32f1xx_hal_gpio_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ha
 switch\stm32f1xx_hal_gpio_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_exti.h
 switch\stm32f1xx_hal_gpio_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h
 switch\stm32f1xx_hal_gpio_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h
+switch\stm32f1xx_hal_gpio_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h
 switch\stm32f1xx_hal_gpio_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h
 switch\stm32f1xx_hal_gpio_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h
 switch\stm32f1xx_hal_gpio_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h

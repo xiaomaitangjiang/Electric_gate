@@ -21,6 +21,7 @@ switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_exti.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h
+switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h
@@ -34,6 +35,8 @@ switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cstdlib
 switch\main.o: ../Inc/adc.h
 switch\main.o: ../Inc/dma.h
 switch\main.o: ../Inc/i2c.h
@@ -45,3 +48,5 @@ switch\main.o: ../Inc/gpio.h
 switch\main.o: ../oled/oled.h
 switch\main.o: ../oled/oledfont.h
 switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+switch\main.o: ..\oled\menu\menu.h
+switch\main.o: ../Inc/can.h

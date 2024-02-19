@@ -36,12 +36,15 @@ extern UART_HandleTypeDef huart1;
 
 extern UART_HandleTypeDef huart2;
 
+extern UART_HandleTypeDef huart3;
+
 /* USER CODE BEGIN Private defines */
 uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V1,double * C1,double * P1,double * E_con1);
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
+void MX_USART3_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 

@@ -36,6 +36,8 @@ switch\uartsoft.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 switch\uartsoft.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 switch\uartsoft.o: ../Inc/gpio.h
 switch\uartsoft.o: ../Inc/main.h
+switch\uartsoft.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+switch\uartsoft.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cstdlib
 switch\uartsoft.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\time.h
 switch\uartsoft.o: ..\Universal Receiver Transmitter\process.h
 switch\uartsoft.o: ../oled/oledfont.h

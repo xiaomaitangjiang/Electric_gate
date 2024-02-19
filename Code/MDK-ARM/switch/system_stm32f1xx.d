@@ -1,4 +1,4 @@
-switch\system_stm32f1xx.o: ../Src/system_stm32f1xx.c
+switch\system_stm32f1xx.o: ..\Src\system_stm32f1xx.c
 switch\system_stm32f1xx.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h
 switch\system_stm32f1xx.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h
 switch\system_stm32f1xx.o: ../Drivers/CMSIS/Include/core_cm3.h
@@ -20,6 +20,7 @@ switch\system_stm32f1xx.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpi
 switch\system_stm32f1xx.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_exti.h
 switch\system_stm32f1xx.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h
 switch\system_stm32f1xx.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h
+switch\system_stm32f1xx.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h
 switch\system_stm32f1xx.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h
 switch\system_stm32f1xx.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h
 switch\system_stm32f1xx.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h

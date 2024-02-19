@@ -13,6 +13,7 @@
 "switch\usart.o"
 "switch\stm32f1xx_it.o"
 "switch\stm32f1xx_hal_msp.o"
+"switch\can.o"
 "switch\stm32f1xx_hal_gpio_ex.o"
 "switch\stm32f1xx_hal_adc.o"
 "switch\stm32f1xx_hal_adc_ex.o"
@@ -33,7 +34,11 @@
 "switch\stm32f1xx_hal_tim.o"
 "switch\stm32f1xx_hal_tim_ex.o"
 "switch\stm32f1xx_hal_uart.o"
-"switch\system_stm32f1xx.o"
+"switch\stm32f1xx_hal_can.o"
+"switch\system_stm32f1xx_1.o"
+"switch\menu.o"
+"switch\funtions.o"
+"switch\process.o"
 --strict --scatter "switch\switch.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

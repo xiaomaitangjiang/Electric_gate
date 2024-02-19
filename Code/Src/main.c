@@ -28,6 +28,8 @@
 #include "gpio.h"
 #include "oled.h"
 #include <string.h>
+#include "menu.h"
+#include "can.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -59,33 +61,82 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 double V=0,C=0,P=0,E_con=0;
-int leakage=0,cross=0,cross_C=0,cross_S=0;
+uint8_t leakage=0,cross=0,cross_C=0,cross_S=0;
 uint16_t errorcode=0x000;
-uint16_t currentMenuIndex=0,time_close=0,time_on=1,enter=0,enter_storage=0,time_storage=0;
+uint16_t currentMenuIndex=0,time_close=0,time_on=0,enter=0,enter_storage=0,time_storage=0;
 uint16_t V_set=0,C_set=0,P_set=0,E_con_set=0;
-int time=0;
-int RH=0,T=0,T1=0;
-int caring=0;
+uint8_t time=0;
+uint8_t RH=0,T=0,T1=0;
+uint8_t caring=0;
 float HZ=0,HZ_S=1;
-int time_h=0,t=0;
+uint8_t time_h=0,t=0;
 uint8_t rxBuffer[24],receive[50];
 uint16_t V_storage=0,P_storage=0;
-uint32_t ADC_RV[30]={0};
-int type;
-int adc_RH,adc_T,adc_V;
+uint16_t ADC_RV[40]={0};
+uint8_t type;
+int16_t adc_RH,adc_T,adc_V;
 uint16_t set_us =0; 
+uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
 
+float temperature,V_ppm,V_adc;
+
+
+uint32_t V_tem;
+int data_plus=0;
+
+
+
+void ppm_processing (uint16_t V_ppm_in,uint16_t *error)
+{
+	if(V_ppm>=1825)//1825为计算估计值
+	{
+		uint16_t error_ppm=0;//忘了，看书
+		error_ppm=error_ppm||*error;
+	}
+}
+
+
+
+
+
+
+//delay us 
+//TIM_HANDLE include in "main.h"
+void delay_us_init(void)
+{MX_TIM4_Init();}
 
 void delay_us(uint16_t us)
 {
-	set_us=us-1;
-	MX_TIM2_Init();
-	HAL_TIM_Base_Start_IT(&htim4);
+	us--;
+	__HAL_TIM_SET_COUNTER(TIM_HANDLE,0);
+	__HAL_TIM_ENABLE(TIM_HANDLE);
+	while(__HAL_TIM_GET_COUNTER(TIM_HANDLE)<us);
+	__HAL_TIM_DISABLE(TIM_HANDLE);
 }
 
-void adc_data_processing (uint32_t adc_data[])
+
+uint16_t adc_data_processing (uint16_t  *adc_data, uint8_t listlength,uint8_t numberstart  ,uint8_t pernumber)
 {
-	
+	data_plus=0;
+	uint8_t tim=0;
+	uint32_t min=0,max=0;
+	max=*adc_data;
+	min=max;
+	for(uint8_t ergodic=numberstart;ergodic<=listlength ;ergodic=ergodic+pernumber)
+	{
+		data_plus=data_plus+(*(adc_data+ergodic));
+		tim++;
+		if(*(adc_data+ergodic)>max)
+		{
+			max=*(adc_data+ergodic);
+		}
+		if(*(adc_data+ergodic)<min)
+			
+		{min=*(adc_data+ergodic);}
+	}
+	data_plus=(data_plus-max-min)/(tim-2);
+	data_plus=(uint16_t)abs((int)(data_plus*3300/4096));
+	return data_plus;
 }
 
 
@@ -135,6 +186,9 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 	}
 }
 
+
+
+
 void HAL_Delay(uint32_t Delay)
 {
 	uint32_t t=Delay*3127;
@@ -146,6 +200,8 @@ void ms_Delay(uint16_t t_ms)
 	uint32_t t=t_ms*3127;
 	while(t--);
 }
+
+
 
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -191,7 +247,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		if (htim->Instance == htim4.Instance)
 		{
-			
+			// nothing here
 		}
 }
 
@@ -218,7 +274,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	
 	//Zero-crossing voltage detection
 
-if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6) == GPIO_PIN_SET)
+if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == GPIO_PIN_SET)
 {
   // PA0 is low
 	cross=1;
@@ -227,7 +283,7 @@ if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6) == GPIO_PIN_SET)
 
 //Leakage detection
 
-if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15) == GPIO_PIN_RESET)
+if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_RESET)
 {
   // PA0 is low
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
@@ -254,283 +310,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 }
 
 
-typedef struct 
-{
-int page;//当前页码
-int line;//当前所选行
-int left;//左侧菜单页码
-int right;//右侧菜单页码
-int enter;//当前页码是否具有可进入的设置
-}menu;
-	
 
-
-
-void page0(int index,int sw_state)
-{
-	if(index==0)
-	{
-	OLED_Clear();
-	OLED_ShowCHinese(0,0,0,0);//电
-  OLED_ShowCHinese(12,0,1,0);//压
-  OLED_ShowCHinese(24,0,27,0);//:
-	OLED_Showdecimal(32,0,V,3,2,12,0);//V
-	OLED_ShowCHinese(0,2,0,0);//电
-  OLED_ShowCHinese(12,2,2,0);//流
-  OLED_ShowCHinese(24,2,27,0);//:
-	OLED_Showdecimal(32,2,C,3,2,12,0);//C
-	OLED_ShowCHinese(0,4,3,0);//功
-  OLED_ShowCHinese(12,4,4,0);//率
-  OLED_ShowCHinese(24,4,27,0);//:
-	OLED_Showdecimal(32,4,P,3,2,12,0);//P
-	OLED_ShowCHinese(0,6,9,0);//累
-	OLED_ShowCHinese(12,6,10,0);//计
-	OLED_ShowCHinese(24,6,5,0);//用
-	OLED_ShowCHinese(36,6,0,0);//电
-	OLED_ShowCHinese(48,6,27,0);//:
-	OLED_Showdecimal(60,6,E_con,3,2,12,0);//E_con
-	OLED_ShowCHinese(102,1,11,sw_state);//开
-	OLED_ShowCHinese(114,1,23,sw_state);//启
-	OLED_ShowCHinese(102,3,21,!sw_state);//关
-  OLED_ShowCHinese(114,3,22,!sw_state);//闭
-	}
-
-}
-	
-void page1(int index,int line, int choise)
-{
-	int turn1=0;
-	int turn2=0;
-	
-	
-	if(choise==1)	
-	{
-		switch (line)
-		{
-			case 1:
-				turn1=1;
-			break;
-			case 2:
-				turn2=1;
-			break;
-		}
-		
-	}
-	if (index==1)
-	{
-	OLED_Clear();	
-	OLED_ShowCHinese(13,0,19,turn1);//定
-	OLED_ShowCHinese(25,0,20,turn1);//时
-	OLED_ShowCHinese(37,0,21,turn1);//关
-	OLED_ShowCHinese(49,0,22,turn1);//闭
-	OLED_ShowCHinese(13,2,19,turn2);//定
-	OLED_ShowCHinese(25,2,20,turn2);//时
-	OLED_ShowCHinese(37,2,23,turn2);//启
-	OLED_ShowCHinese(49,2,24,turn2);//动
-	OLED_ShowCHinese(0,line*2-2,40,0);//->
-	OLED_ShowNum(110,0,time_close,2,12,0);/*关闭时间*/
-	OLED_ShowNum(110,2,time_on,2,12,0);/*开启时间*/
-		
-	}
-}
-
-void page2(int index,int line,int choise)
-{
-	int turn1=0;
-	int turn2=0;
-	int turn3=0;
-	
-	
-	if(choise==1)	
-	{
-		switch (line)
-		{
-			case 1:
-				turn1=1;
-			break;
-			case 2:
-				turn2=1;
-			break;
-			case 3:
-				turn3=1;
-			break;
-		}
-		
-	}
-	if(index==2)
-	{
-	OLED_Clear();	
-	OLED_ShowCHinese(13,0,38,turn1);//最
-	OLED_ShowCHinese(25,0,39,turn1);//大
-	OLED_ShowCHinese(37,0,0,turn1);//电
-	OLED_ShowCHinese(49,0,1,turn1);//压
-	OLED_ShowCHinese(13,2,38,turn2);//最
-	OLED_ShowCHinese(25,2,39,turn2);//大
-	OLED_ShowCHinese(37,2,0,turn2);//电
-	OLED_ShowCHinese(49,2,2,turn2);//流
-	OLED_ShowCHinese(13,4,38,turn3);//最
-	OLED_ShowCHinese(25,4,39,turn3);//大
-	OLED_ShowCHinese(37,4,32,turn3);//实
-	OLED_ShowCHinese(49,4,33,turn3);//时
-  OLED_ShowCHinese(61,4,3,turn3);//功
-  OLED_ShowCHinese(73,4,4,turn3);//率	
-	OLED_ShowCHinese(0,line*2-2,40,0);//->
-	OLED_ShowNum(86,0,V_set,3,12,0);/*最大电压*/
-	OLED_ShowNum(86,2,C_set,5,12,0);/*最大电流*/
-	OLED_ShowNum(86,4,E_con_set,5,12,0);/*最大实时功率*/
-
-	}
-}
-
-void page3(int index,int type)
-{
-	if (index==3)
-	{
-		OLED_Clear();	
-		switch(type)
-		{
-			case 1:
-				OLED_ShowCHinese(0,6,54,0);//寄
-				OLED_ShowCHinese(12,6,55,0);//存
-				OLED_ShowCHinese(24,6,56,0);//器
-				OLED_ShowCHinese(36,6,34,0);//错
-			  OLED_ShowCHinese(48,6,35,0);//误
-			  OLED_ShowCHinese(60,6,67,0);//清除符
-			break;
-			case 2:
-				OLED_ShowCHinese(0,6,57,0);//误
-				OLED_ShowCHinese(12,6,58,0);//差
-				OLED_ShowCHinese(24,6,59,0);//修
-				OLED_ShowCHinese(36,6,60,0);//正
-			  OLED_ShowCHinese(48,6,61,0);//失
-			  OLED_ShowCHinese(60,6,62,0);//效
-			break;
-			case 4:
-				OLED_ShowCHinese(0,6,0,0);//电
-				OLED_ShowCHinese(12,6,1,0);//压
-				OLED_ShowCHinese(24,6,45,0);//过
-				OLED_ShowCHinese(36,6,39,0);//大
-			  OLED_ShowCHinese(48,6,67,0);//清除符
-			  OLED_ShowCHinese(60,6,67,0);//清除符
-			break;
-			case 5:
-				OLED_ShowCHinese(0,6,0,0);//电
-				OLED_ShowCHinese(12,6,2,0);//流
-				OLED_ShowCHinese(24,6,45,0);//过
-				OLED_ShowCHinese(36,6,39,0);//大
-			  OLED_ShowCHinese(48,6,67,0);//清除符
-			  OLED_ShowCHinese(60,6,67,0);//清除符
-			break;
-			case 6:
-				OLED_ShowCHinese(0,6,3,0);//功
-				OLED_ShowCHinese(12,6,4,0);//率
-				OLED_ShowCHinese(24,6,45,0);//过
-				OLED_ShowCHinese(36,6,39,0);//大
-			  OLED_ShowCHinese(48,6,67,0);//清除符
-			  OLED_ShowCHinese(60,6,67,0);//清除符
-			break;
-			case 7:
-				OLED_ShowCHinese(0,6,65,0);//达
-				OLED_ShowCHinese(12,6,66,0);//到
-				OLED_ShowCHinese(24,6,25,0);//设
-				OLED_ShowCHinese(36,6,26,0);//置
-			  OLED_ShowCHinese(48,6,7,0);//度
-			  OLED_ShowCHinese(60,6,8,0);//数
-			case 9:
-				OLED_ShowCHinese(0,6,45,0);//过
-				OLED_ShowCHinese(12,6,64,0);//载
-			  OLED_ShowCHinese(24,6,67,0);//清除符
-			  OLED_ShowCHinese(36,6,67,0);//清除符
-			  OLED_ShowCHinese(48,6,67,0);//清除符
-			  OLED_ShowCHinese(60,6,67,0);//清除符
-			break;
-			case 8:
-				OLED_ShowCHinese(0,6,42,0);//短
-				OLED_ShowCHinese(12,6,43,0);//路
-			  OLED_ShowCHinese(24,6,67,0);//清除符
-			  OLED_ShowCHinese(36,6,67,0);//清除符
-			  OLED_ShowCHinese(48,6,67,0);//清除符
-			  OLED_ShowCHinese(60,6,67,0);//清除符
-			break;
-			case 3:
-				OLED_ShowCHinese(0,6,41,0);//漏
-				OLED_ShowCHinese(12,6,0,0);//电
-			  OLED_ShowCHinese(24,6,67,0);//清除符
-			  OLED_ShowCHinese(36,6,67,0);//清除符
-			  OLED_ShowCHinese(48,6,67,0);//清除符
-			  OLED_ShowCHinese(60,6,67,0);//清除符
-			break;
-		}
-		OLED_ShowCHinese(0,0,0,0);//电
-	  OLED_ShowCHinese(12,0,43,0);//路
-		OLED_ShowCHinese(24,0,52,0);//频
-	  OLED_ShowCHinese(36,0,53,0);//率
-		
-		OLED_ShowCHinese(0,3,34,0);//错
-	  OLED_ShowCHinese(12,3,35,0);//误
-		OLED_ShowCHinese(24,3,27,0);//:
-		
-		/*频率*/
-		OLED_ShowNum(86,0,(int)HZ,2,12,0);
-	}
-}
-
-void page5(int index)
-{
-	if (index==5)
-	{
-		OLED_Clear();	
-		OLED_DrawBMP(0,0,45,7,gImage_1,0);
-		OLED_ShowCHinese(48,0,11,0);//开
-	  OLED_ShowCHinese(60,0,12,0);//发
-	  OLED_ShowCHinese(72,0,13,0);//者
-		OLED_ShowCHinese(84,0,27,0);//:
-		OLED_ShowString(96,0,"Wesp",12,0);
-		OLED_ShowCHinese(48,3,14,0);//版
-	  OLED_ShowCHinese(60,3,15,0);//本
-	  OLED_ShowCHinese(72,3,16,0);//号
-		OLED_ShowCHinese(84,3,27,0);//:
-		OLED_ShowString(96,3,"1.0",12,0);
-	}
-}
-
-	void page4(int index)
-{
-	
-	
-	if(index==4)
-	{
-	OLED_Clear();	
-	OLED_ShowCHinese(13,0,47,0);//温
-	OLED_ShowCHinese(25,0,48,0);//度
-		
-	OLED_ShowCHinese(13,2,49,0);//湿
-	OLED_ShowCHinese(25,2,48,0);//度
-		
-	OLED_ShowCHinese(13,4,50,0);//结
-	OLED_ShowCHinese(25,4,51,0);//露
-	OLED_ShowCHinese(37,4,47,0);//温
-	OLED_ShowCHinese(49,4,48,0);//度	
-	OLED_ShowNum(86,0,25,5,12,0);/*湿度*/
-	OLED_ShowNum(86,2,26,5,12,0);/*温度*/
-	OLED_ShowNum(86,4,14,2,12,0);	/*结露温度*/
-
-	}
-}		
-
-
-
-	
-//page,line,left,right,enter
-menu m[]=
-{
-	{0,0,1,5,1},//主页
-	{1,1,2,0,1},//定时
-	{2,1,3,1,1},//安全设置
-	{3,0,4,2,0},//故障显示
-	{4,0,5,3,0},//温度，湿度，露点显示
-	{5,0,0,4,0},//关于
-};
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -567,27 +347,28 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-
   //MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   MX_RTC_Init();
-  MX_I2C2_Init();
+	MX_I2C1_Init();
   MX_TIM3_Init();
   MX_ADC1_Init();
+	
 	OLED_Init();
 	OLED_Clear();
+	delay_us_init();
   /* USER CODE BEGIN 2 */
-  uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
-	
+  
+
   /*使能定时器1中断*/
   HAL_TIM_Base_Start_IT(&htim2);
   HAL_TIM_Base_Start_IT(&htim3);
 	
-	//HAL_ADCEx_Calibration_Start(&hadc1);
-	//ms_Delay(10);
-	//HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,30);
+	HAL_ADCEx_Calibration_Start(&hadc1);
+	while(HAL_ADCEx_Calibration_Start(&hadc1));
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,40);
 	
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receive,24);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
@@ -597,447 +378,76 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		OLED_ShowNum(86,0,25,5,12,0);
-		ms_Delay(100);
     //iwdg refresh
-//HAL_IWDG_Refresh(&hiwdg);
+		//HAL_IWDG_Refresh(&hiwdg);
 
-errorprocessing(errorcode,&currentMenuIndex);	
-		
-//safety funtion
-if(V>=V_set)
-{
-  cross_S=0;
-	errorcode=0x008|errorcode;
-	control();	
-}
-else if(0x008&errorcode)
-{errorcode=0x008^errorcode;}
-
-if(C>=C_set)
-{
-  cross_S=0;
-	errorcode=0x010|errorcode;
-	control();
-}
-else if(0x010&errorcode)
-{errorcode=0x010^errorcode;}
-
-if(P>=P_set)
-{
-  cross_S=0;
-	errorcode=0x020|errorcode;
-	control();
-}
-else if(0x020&errorcode)
-{errorcode=0x020^errorcode;}
-
-if(E_con>=E_con_set)
-{
-  cross_S=0;
-	errorcode=0x040|errorcode;
-	control();
-}
-else if(0x040&errorcode)
-{errorcode=0x040^errorcode;}
-if(V-22>V_storage)
-{
-	cross_S=0;
-	errorcode=0x080|errorcode;
-	control();
-}
-else if(0x080&errorcode)
-{errorcode=0x080^errorcode;}
-if(P_storage>P_set)
-{
-	cross_S=0;
-  errorcode=0x100|errorcode;
-	control();
-}
-else if(0x100&errorcode)
-{errorcode=0x100^errorcode;}
-
-//OLED
-
-
-
-
-// 读取按键状态
-        GPIO_PinState key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY1 left
-        GPIO_PinState key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY2  right
-        GPIO_PinState key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1); // KEY3  enter
-        GPIO_PinState key4State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12); // KEY4  line
-
+		errorprocessing(errorcode,&currentMenuIndex);	
 	
-if (caring==0&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET )
-{
-	ms_Delay(10);
-	caring=1;	
-	while (key1State == GPIO_PIN_RESET || key2State == GPIO_PIN_RESET  || key3State == GPIO_PIN_RESET)
-	{
-   key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY1
-   key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY2
-   key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1); // KEY3
+		//safety funtion
+		
+		if(V>=V_set)
+		{
+			cross_S=0;
+			errorcode=0x008|errorcode;
+			control();	
+		}
+		else if(0x008&errorcode)
+		{errorcode=0x008^errorcode;}
 
-	}
-}
-else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  && key3State == GPIO_PIN_RESET )
-{
-	ms_Delay(10);
-	caring=0;
-	while (key1State == GPIO_PIN_RESET || key2State == GPIO_PIN_RESET || key3State == GPIO_PIN_RESET)
-	{
-   key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY1
-   key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY2
-   key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1); // KEY3
+		if(C>=C_set)
+		{
+			cross_S=0;
+			errorcode=0x010|errorcode;
+			control();
+		}
+		else if(0x010&errorcode)
+		{errorcode=0x010^errorcode;}
 
-	}
-}
-        if(enter==0)
-				{
-					// 处理按键事件
-        if (key1State == GPIO_PIN_RESET || key2State == GPIO_PIN_RESET || key4State == GPIO_PIN_RESET || key3State == GPIO_PIN_RESET ) {
-            ms_Delay(25); // 消抖延时
+		if(P>=P_set)
+		{
+			cross_S=0;
+			errorcode=0x020|errorcode;
+			control();
+		}
+		else if(0x020&errorcode)
+		{errorcode=0x020^errorcode;}
 
-            if (key1State == GPIO_PIN_RESET) {
-                currentMenuIndex = m[currentMenuIndex].left; // 向左选择
-                while (key1State == GPIO_PIN_RESET) {
-                    key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0); // KEY1连接到GPIOA的7引脚
-                }
-							
-            }
+		if(E_con>=E_con_set)
+		{
+			cross_S=0;
+			errorcode=0x040|errorcode;
+			control();
+		}
+		else if(0x040&errorcode)
+		{errorcode=0x040^errorcode;}
+		if(V-22>V_storage)
+		{
+			cross_S=0;
+			errorcode=0x080|errorcode;
+			control();
+		}
+		else if(0x080&errorcode)
+		{errorcode=0x080^errorcode;}
+		if(P_storage>P_set)
+		{
+			cross_S=0;
+			errorcode=0x100|errorcode;
+			control();
+		}
+		else if(0x100&errorcode)
+		{errorcode=0x100^errorcode;}
 
-            if (key2State == GPIO_PIN_RESET) {
-                currentMenuIndex = m[currentMenuIndex].right; // 向右选择
-                while (key2State == GPIO_PIN_RESET) {
-                    key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); // KEY2连接到GPIOB的0引脚
-                }
-            }
+		//menu funtion
+		menuprocess();
 
-           
-						  if (key3State == GPIO_PIN_RESET) {
-							while (key3State == GPIO_PIN_RESET) {
-                    key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
-							lineindex=m[currentMenuIndex].line++;
-				
-						}
-					 
-						if (key4State == GPIO_PIN_RESET) {
-                enter = m[currentMenuIndex].enter; // 确认
-                while (key4State == GPIO_PIN_RESET) {
-                    key4State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12); // KEY4连接到GPIOB的11引脚
-                }
-            }
-						
-					
-						
-						
-						
-         } 
-		    }
-
-				else if(enter==1)
-				{
-					if (key4State == GPIO_PIN_RESET)//取消选择操作
-							{
-								ms_Delay(10); // 消抖延时
-								enter = 0;
-								while (key4State == GPIO_PIN_RESET) {
-                    key4State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12); // KEY4连接到GPIOB的11引脚
-								}
-							}
-							if(currentMenuIndex==0)
-							{
-								ms_Delay(10); // 消抖延时
-								if(cross_C==0)
-								{
-									cross_C=1;
-									enter=0;
-								}
-								else if(cross_C==1)
-								{
-									cross_C=0;
-									enter=0;
-								}
-								
-							}
-					if(currentMenuIndex==1)
-					{
-						if(m[currentMenuIndex].line==1)
-						{
-							if(key1State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								time_close--;
-							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
-							}
-							
-							if(key2State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								time_close++;
-							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
-							}
-							
-							if(key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								time_close=time_close+10;
-							  while(key3State == GPIO_PIN_RESET)
-							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
-							}
-							
-							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								time_close=time_close-10;
-							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
-							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
-								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
-								}
-							}
-							if(time_close+time_on!=time_close)
-				      {time_on=0;}
-							
-						
-						}
-						if(m[currentMenuIndex].line==2)
-						{
-							
-							if(key1State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								time_on--;
-							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
-							}
-							
-							if(key2State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								time_on++;
-							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
-							}
-							
-							if(key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								time_on=time_on+10;
-							  while(key3State == GPIO_PIN_RESET)
-							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
-							}
-							
-							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								time_on=time_on-10;
-							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
-							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
-								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
-								}
-							}
-							if(time_close+time_on!=time_on)
-				      {time_close=0;}
-
-						
-						}
-						
-					
-					}
-					if(currentMenuIndex==2)
-					{
-						if(m[currentMenuIndex].line==1)
-						{
-							if(key1State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								V_set--;
-							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
-							}
-							
-							if(key2State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								V_set++;
-							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
-							}
-							
-							if(key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								V_set=V_set+10;
-							  while(key3State == GPIO_PIN_RESET)
-							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
-							}
-							
-							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								V_set=V_set-10;
-							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
-							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
-								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
-								}
-							}
-							
-						
-						}
-						if(m[currentMenuIndex].line==2)
-						{
-							
-							if(key1State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								C_set--;
-							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
-							}
-							
-							if(key2State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								C_set++;
-							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
-							}
-							
-							if(key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								C_set=C_set+10;
-							  while(key3State == GPIO_PIN_RESET)
-							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
-							}
-							
-							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								C_set=C_set-10;
-							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
-							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
-								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
-								}
-							}
-
-
-						
-						}
-						if(m[currentMenuIndex].line==3)
-						{
-							
-							if(key1State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								P_set--;
-							  while(key1State == GPIO_PIN_RESET)
-							  {key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);}
-							}
-							
-							if(key2State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								P_set++;
-							  while(key2State == GPIO_PIN_RESET)
-							  {key2State = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);}
-							}
-							
-							if(key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								P_set=P_set+10;
-							  while(key3State == GPIO_PIN_RESET)
-							  {key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);}
-							}
-							
-							if(key1State == GPIO_PIN_RESET && key3State == GPIO_PIN_RESET)
-							{
-								ms_Delay(10); // 消抖延时
-								P_set=P_set-10;
-							  while(key1State == GPIO_PIN_RESET&&key3State == GPIO_PIN_RESET)
-							  {
-									key1State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0);
-								  key3State = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
-								}
-							}
-							
-
-
-						
-						}
-						
-						
-					}
-				
-				
-				}
-				lineindex=m[currentMenuIndex].line;
-				if(lineindex>2)
-				{
-					if(currentMenuIndex==1)
-					{m[currentMenuIndex].line=1;}
-					if(currentMenuIndex==2&&lineindex>3)
-					{m[currentMenuIndex].line=1;}
-				}
-				if(caring==1)
-					{
-					    if(currentMenuIndex>4&&currentMenuIndex_storage==4)
-							  {currentMenuIndex=0;}
-							else if (currentMenuIndex>4&&currentMenuIndex_storage==0)
-							  {currentMenuIndex=4;}
-							if(currentMenuIndex==2&&currentMenuIndex_storage==1)
-								{
-									currentMenuIndex=3;
-							  }
-							else if(currentMenuIndex==2&&currentMenuIndex_storage==3)
-								{
-									currentMenuIndex=1;
-							  }
-					}
-				
-				  if(currentMenuIndex_storage!=currentMenuIndex)//页面切换后使行数归1
-						{
-						lineindex=1;
-						}
-					if(currentMenuIndex_storage!=currentMenuIndex ||lineindex_storage!=lineindex||data!=V_set+C_set+P_set+time_close+time_on||enter_storage!=enter||HZ_S!=HZ)
-					{
-						ms_Delay(1);
-						if(caring==0)
-						{
-	          page0(currentMenuIndex,cross_C);
-            page1(currentMenuIndex,lineindex,enter);
-	          page2(currentMenuIndex,lineindex,enter);
-						page3(currentMenuIndex,errorprocessing(errorcode,&currentMenuIndex));
-						page4(currentMenuIndex);
-						page5(currentMenuIndex);
-					  }
-						else if (caring==1)
-						{
-							 page0(currentMenuIndex,cross_C);
-               page1(currentMenuIndex,lineindex,enter);
-							 page3(currentMenuIndex,errorprocessing(errorcode,&currentMenuIndex));
-							 page4(currentMenuIndex);
-							
-							
-							
-						}
-          }
-					
-				
-				  currentMenuIndex_storage=currentMenuIndex;
-					lineindex_storage=lineindex;
-					data=V_set+C_set+P_set+time_close+time_on;
-					enter_storage=enter;
-					HZ_S=HZ;
-					
+		//adc dataprocess
+		V_tem=adc_data_processing(ADC_RV,40,1,3);
+		temperature=abs(static_cast<int>(1430-V_tem))/4.3+25;
+		
+		V_ppm=adc_data_processing(ADC_RV,40,0,3);
+		V_adc=adc_data_processing(ADC_RV,40,2,3);
+		//
+		//ppm_processing(V_ppm,&errorcode);	先不启用，原因见函数体		
   }
   /* USER CODE END 3 */
 }
