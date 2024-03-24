@@ -1,8 +1,12 @@
-#include "process.h"
+#include "process.hpp"
 
+communciation URTP;
+uint8_t URTP_UART_Receive[5];
+uint8_t IIC_data[5];
 
 void empty(void)
 {}
+
 
 	
 void Highresistance_IO(uint32_t pin,GPIO_TypeDef * pin_type)
@@ -10,73 +14,79 @@ void Highresistance_IO(uint32_t pin,GPIO_TypeDef * pin_type)
 	  GPIO_InitTypeDef GPIO_InitStruct = {0};
 		
 		GPIO_InitStruct.Pin = pin;
-		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		HAL_GPIO_Init(pin_type, &GPIO_InitStruct);
-		HAL_GPIO_WritePin(pin_type, pin, GPIO_PIN_RESET);
 }
 	
+
+
+void communciation::expanddata(uint8_t * data_in,action  *action_store ,
+	uint16_t  *V_SET ,uint16_t  *P_SET ,uint16_t  *I_SET ,uint16_t  *E_SET)
+{
+	Receive_port(data_in,action_store,V_SET,P_SET,I_SET,E_SET);
+}
+
 //处理外部传入的数据，转换为内部格式
-void communication::IIC_RECEIVE(void)
+//输出传入的数据
+void communciation::Receive_port(uint8_t *receive,action  *action_out ,uint16_t  *V_SET_out ,
+														uint16_t  *P_SET_out ,uint16_t  *I_SET_out ,uint16_t  *E_SET_out)
 {
 	
+	dataprocessing(receive,action_out,V_SET_out,P_SET_out,I_SET_out,E_SET_out);
 }
 
 
-void communication::UARTSOFT_RECEIVE(void)
-{empty();}
-
-void communication::SMBUS_RECEIVE(void)
-{empty();}
-
-void communication::CAN_RECEIVE(void)
+void communciation::IIC_RECEIVE(void)
 {
-	
+	HAL_I2C_Slave_Receive_IT(&hi2c2,IIC_data,sizeof(IIC_data));
 }
 
-communication::communication()
-{}
-communication::~communication()
-{}
+void communciation::UART_RECEIVE(void)
+{
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart3,URTP_UART_Receive,5);//dma
+	__HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
+}
+
+void communciation::SMBUS_RECEIVE(void)
+{empty();}
+
+void communciation::CAN_RECEIVE(void)
+{empty();}
+
+
 
 /**
  * @function: int modeprocessing (expand * data)
- * @description: 传输模式处理函数
- * @param {expand} 传入的expand数组
- * @return {unsigned int} result
+ * @description: URTP传输初始化函数
+ * @param {expand} 传入的expand数组，设置传输协议
+ * @return *
  */
-void communication::modeprocessing (expand * modedata)
+void communciation::expandinit (expand * modedata)
 {
-	if(modedata->mode!=0)
-	{
-		expandinit(modedata->mode);	
-	}
-	if(modedata->Transmit==uart)
-	{
-		//uart传输函数
-		expandinit(modedata->mode);
-		UARTSOFT_RECEIVE();
-	}
-	else if(modedata->Transmit==iic)
-	{
-		//IIC
-		expandinit(modedata->mode);
-		IIC_RECEIVE();
-	}
-	else if(modedata->Transmit==smbus)
-	{
-		//SMBUS
-		expandinit(modedata->mode);
-		SMBUS_RECEIVE();
-	}
-	else if(modedata->Transmit==can)
-	{
-		//CAN总线
-		expandinit(modedata->mode);
-		CAN_RECEIVE();
-	}
-	else
-	{modedata->Transmit=none;}
+		if(modedata->Transmit==uart)
+		{
+			//uart传输函数
+			modeprocessing(modedata->Transmit);
+		}
+		else if(modedata->Transmit==iic)
+		{
+			//IIC
+			modeprocessing(modedata->Transmit);
+		}
+		else if(modedata->Transmit==smbus)
+		{
+			//SMBUS
+			modeprocessing(modedata->Transmit);
+		}
+		else if(modedata->Transmit==can)
+		{
+			//CAN总线
+			modeprocessing(modedata->Transmit);
+		}
+		else
+		{modedata->Transmit=none;}
+		
 }
 
 
@@ -86,26 +96,29 @@ void communication::modeprocessing (expand * modedata)
  * @param {int} initmode通讯模式
  * @return {void} 
  */
-void communication::expandinit (int initmode)
+void communciation::modeprocessing (TransmissionProtocols initmode)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	
 	//默认高阻态
 		Highresistance_IO(GPIO_Init_P,GPIO_Init_type);
 		Highresistance_IO(GPIO_Init_Q,GPIO_Init_type);
-	if(initmode==1)
+	if(initmode==iic)
 	{ //iic模式
 		MX_I2C2_Init();
+		IIC_RECEIVE();
 	}
-	else if(initmode==2)
+	else if(initmode==uart)
 	{//uart模式
 		MX_USART3_UART_Init();
+		UART_RECEIVE();
 	}
-	else if(initmode==3)
+	else if(initmode==can)
 	{//can模式
 		MX_CAN_Init();
+		CAN_RECEIVE();
 	}
-	else if(initmode==4)
+	else if(initmode==IT_fall)
 	{//下降沿中断触发
 		GPIO_InitStruct.Pin = GPIO_Init_Q;
 		GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
@@ -113,7 +126,7 @@ void communication::expandinit (int initmode)
 		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);
 		
 	}
-	else if(initmode==5)
+	else if(initmode==IT_rise)
 	{//上升沿中断触发
 		GPIO_InitStruct.Pin = GPIO_Init_Q;
 		GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
@@ -121,12 +134,17 @@ void communication::expandinit (int initmode)
 		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);
 		
 	}
-	else if(initmode==6)
+	else if(initmode==IT_rise_fall)
 	{//上升下降中断触发
 		GPIO_InitStruct.Pin = GPIO_Init_Q;
 		GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
 		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 		HAL_GPIO_Init(GPIO_Init_type, &GPIO_InitStruct);
+		
+	}
+	else if(initmode==devices_transmit)
+	{
+		//多设备主/从机模式初始化
 		
 	}
 	
@@ -140,7 +158,7 @@ void communication::expandinit (int initmode)
  * @param: 输入一个数组
  * @return {*}
  */
-void communication::Firstbyteprocess (uint8_t Bytein,action *reaction)
+void communciation::Firstbyteprocess (uint8_t Bytein,action *reaction)
 {
 		uint8_t bitcheck[]={B1,B10,B100,B1000,B10000,B100000,B1000000,B10000000};//二进制数，定义见头文件
 		
@@ -186,7 +204,7 @@ void communication::Firstbyteprocess (uint8_t Bytein,action *reaction)
  * @return {*}
  */
 	
-void communication::dataprocessing (uint8_t  *data_IN[5] ,action  *action_store,
+void communciation::dataprocessing (uint8_t  *data_IN ,action  *action_store,
 	uint16_t  *V_SET ,uint16_t  *P_SET ,uint16_t  *I_SET ,uint16_t  *E_SET)
 
 {

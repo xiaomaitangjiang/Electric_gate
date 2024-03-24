@@ -1,5 +1,5 @@
-switch\process.o: ..\Universal Receiver Transmitter\process.c
-switch\process.o: ..\Universal Receiver Transmitter\process.h
+switch\process.o: ..\Universal Receiver Transmitter\process.cpp
+switch\process.o: ..\Universal Receiver Transmitter\process.hpp
 switch\process.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 switch\process.o: ../Inc/stm32f1xx_hal_conf.h
 switch\process.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h
@@ -35,7 +35,6 @@ switch\process.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
 switch\process.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 switch\process.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 switch\process.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-switch\process.o: ../oled/oledfont.h
 switch\process.o: ../Inc/gpio.h
 switch\process.o: ../Inc/main.h
 switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
@@ -44,3 +43,28 @@ switch\process.o: ../Inc/can.h
 switch\process.o: ../Inc/usart.h
 switch\process.o: ../Inc/i2c.h
 switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+switch\process.o: ..\Universal Receiver Transmitter\enum define\typeport.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\vector
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\limits
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_defs.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_config.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/config.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_math.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cmath
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cfloat
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\float.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\climits
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\memory
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\new
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\exception
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\utility
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_iterbase.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cstddef
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_mutex.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cstring
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_algobase.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_iterator.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_dispatch.h
+switch\process.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_error.h

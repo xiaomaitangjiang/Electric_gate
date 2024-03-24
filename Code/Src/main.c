@@ -17,6 +17,9 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+
+//warning::请使用c++编译
+
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
@@ -30,6 +33,11 @@
 #include <string.h>
 #include "menu.h"
 #include "can.h"
+#include "funtion.hpp"
+#include "process.hpp"
+#include "esp8266.h"
+#include "SHT3x.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -60,141 +68,67 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-double V=0,C=0,P=0,E_con=0;
-uint8_t leakage=0,cross=0,cross_C=0,cross_S=0;
-uint16_t errorcode=0x000;
-uint16_t currentMenuIndex=0,time_close=0,time_on=0,enter=0,enter_storage=0,time_storage=0;
-uint16_t V_set=0,C_set=0,P_set=0,E_con_set=0;
-uint8_t time=0;
-uint8_t RH=0,T=0,T1=0;
-uint8_t caring=0;
-float HZ=0,HZ_S=1;
-uint8_t time_h=0,t=0;
-uint8_t rxBuffer[24],receive[50];
-uint16_t V_storage=0,P_storage=0;
-uint16_t ADC_RV[40]={0};
-uint8_t type;
-int16_t adc_RH,adc_T,adc_V;
-uint16_t set_us =0; 
-uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
+ uint8_t dat[8];
+ action re[10];
 
+// data of circuit
+double V=0,C=0,P=0,E_con=0;
+uint16_t V_set=220;
+uint16_t C_set=10,P_set=100,E_con_set=50;
+uint8_t leakage=0,cross=0,cross_t=0,cross_user=0;
+uint16_t errorcode=0x000;
+float HZ=0,HZ_S=1;//HZ is the fequence of circuit
+
+//meun
+uint16_t currentMenuIndex=0,time_close=0,time_on=0,enter=0,enter_storage=0,time_storage=0;
+uint8_t caring=0;
+uint16_t V_storage=0,P_storage=0;
+uint16_t currentMenuIndex_storage=1,lineindex=1,lineindex_storage=0,data=0;
+uint8_t type;
+
+
+//TIM
+uint8_t time=0;
+uint8_t time_h=0,t=0;
+
+
+// data of environment
+uint8_t RH=0,T=0,Td=0;
 float temperature,V_ppm,V_adc;
 
 
-uint32_t V_tem;
-int data_plus=0;
+//UART
+uint8_t receive[50];
+extern uint8_t URTP_UART_Receive[5];
+
+//ADC
+uint16_t ADC_RV[3]={0};
+
+
+//TIM_us
+uint16_t set_us =0; 
+
+
+//URTP
+action reflect;
+extern communciation URTP;
 
 
 
-void ppm_processing (uint16_t V_ppm_in,uint16_t *error)
+
+//浓度处理函数
+void ppm_processing (const uint16_t V_ppm_in,uint16_t *error)
 {
 	if(V_ppm>=1825)//1825为计算估计值
 	{
-		uint16_t error_ppm=0;//忘了，看书
+		uint16_t error_ppm=0x200;
 		error_ppm=error_ppm||*error;
 	}
 }
 
 
 
-
-
-
-//delay us 
-//TIM_HANDLE include in "main.h"
-void delay_us_init(void)
-{MX_TIM4_Init();}
-
-void delay_us(uint16_t us)
-{
-	us--;
-	__HAL_TIM_SET_COUNTER(TIM_HANDLE,0);
-	__HAL_TIM_ENABLE(TIM_HANDLE);
-	while(__HAL_TIM_GET_COUNTER(TIM_HANDLE)<us);
-	__HAL_TIM_DISABLE(TIM_HANDLE);
-}
-
-
-uint16_t adc_data_processing (uint16_t  *adc_data, uint8_t listlength,uint8_t numberstart  ,uint8_t pernumber)
-{
-	data_plus=0;
-	uint8_t tim=0;
-	uint32_t min=0,max=0;
-	max=*adc_data;
-	min=max;
-	for(uint8_t ergodic=numberstart;ergodic<=listlength ;ergodic=ergodic+pernumber)
-	{
-		data_plus=data_plus+(*(adc_data+ergodic));
-		tim++;
-		if(*(adc_data+ergodic)>max)
-		{
-			max=*(adc_data+ergodic);
-		}
-		if(*(adc_data+ergodic)<min)
-			
-		{min=*(adc_data+ergodic);}
-	}
-	data_plus=(data_plus-max-min)/(tim-2);
-	data_plus=(uint16_t)abs((int)(data_plus*3300/4096));
-	return data_plus;
-}
-
-
-//异常警告
-uint8_t errorprocessing (uint16_t errortype,uint16_t * index)
-{
-	/*uint8_t type1=0;
-	if(errortype!=0)
-	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
-		*index=3;
-		if((errortype&0x01)!=0)
-		{type1=1;}
-		if((errortype&0x02)!=0)
-		{type1=2;}
-		if((errortype&0x04)!=0)
-		{type1=3;}
-		if((errortype&0x08)!=0)
-		{type1=4;}
-		if((errortype&0x10)!=0)
-		{type1=5;}
-		if((errortype&0x20)!=0)
-		{type1=6;}
-		if((errortype&0x40)!=0)
-		{type1=7;}
-		if((errortype&0x80)!=0)
-		{type1=8;}
-		if((errortype&0x100)!=0)
-		{type1=9;}
-	}
-	else if(errortype==0)
-	{HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);}
-	
-	return type1;*/
-	return 0;
-}
-
-
-
-//串口dma接收错误不进入回调函数的罪魁祸首，该函数是弱定义
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-	if(huart->Instance ==USART2)
-	{
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receive,24);
-	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
-	}
-}
-
-
-
-
-void HAL_Delay(uint32_t Delay)
-{
-	uint32_t t=Delay*3127;
-	while(t--);
-	
-}
+//ms延时
 void ms_Delay(uint16_t t_ms)
 {
 	uint32_t t=t_ms*3127;
@@ -204,6 +138,24 @@ void ms_Delay(uint16_t t_ms)
 
 
 
+//串口dma接收错误不进入回调函数的罪魁祸首，该函数是弱定义
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance ==USART1)
+	{
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receive,24);
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+	}
+	if(huart->Instance ==USART3)
+	{
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart3,URTP_UART_Receive,5);
+	__HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
+	}
+}
+
+
+
+//TIM回调函数
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     time++;
@@ -215,13 +167,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				time++;
         if (time == time_close*65)
 				{
-					cross_C=0;
+					cross_t=0;
 					time_close=0;
 					time=0;
 				}
         if(time == time_on*65)
 				{
-					cross_C=1;
+					cross_t=1;
 					time_on=0;
 					time=0;
 				}
@@ -240,35 +192,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			if (time_h==2)
 			{
 				HZ=(float)(t/time_h);
-				ms_Delay(1);
+				HAL_Delay(1);
 				t=0;
 				time_h=0;
 			}
 		}
-		if (htim->Instance == htim4.Instance)
-		{
-			// nothing here
-		}
+		
 }
 
 
 
-//control
-void control(void)
-{
-if(cross==1||cross_C==1||cross_S==1)
-	{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-		ms_Delay(1);
-		cross=0;
-	}
-	else
-	{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-	}
-}
-
-
+//gpio中断回调函数
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	
@@ -281,8 +215,8 @@ if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == GPIO_PIN_SET)
 	t++;
 }
 
-//Leakage detection
 
+//Leakage detection
 if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_RESET)
 {
   // PA0 is low
@@ -303,11 +237,54 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 		 V_storage=V , P_storage=P;
 		 errorcode = HLW8032_Data_processing(receive,&V,&C,&P,&E_con);
 	   //V 电压,C 电流,P 功率,E_con 度
-		memset(receive,0,50);
+		memset(receive,0,24);
 		HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receive,24);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
 	}
+	if(huart==&huart3)
+	{
+		
+		expanddata_C(URTP_UART_Receive,&reflect,&V_set,&P_set,&C_set,&E_con_set);
+		
+		memset(URTP_UART_Receive,0,5);
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart3,receive,5);
+	__HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
+	}
 }
+
+
+extern uint8_t IIC_data[5];
+// iic回调函数
+void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	if(hi2c==&hi2c2)
+	{
+		expanddata_C(IIC_data,&reflect,&V_set,&P_set,&C_set,&E_con_set);
+		HAL_I2C_Slave_Transmit_IT(&hi2c2, IIC_data, sizeof(IIC_data));   // 启动中断发送
+	}
+}
+
+
+
+
+
+	
+//delay us 
+//TIM_HANDLE include in "main.h"
+/*void delay_us_init(void)
+{MX_TIM4_Init();}
+
+void delay_us(uint16_t us)
+{
+	us--;
+	__HAL_TIM_SET_COUNTER(TIM_HANDLE,0);
+	__HAL_TIM_ENABLE(TIM_HANDLE);
+	while(__HAL_TIM_GET_COUNTER(TIM_HANDLE)<us);
+	__HAL_TIM_DISABLE(TIM_HANDLE);
+}*/
+
+
+
 
 
 
@@ -358,7 +335,7 @@ int main(void)
 	
 	OLED_Init();
 	OLED_Clear();
-	delay_us_init();
+  esp8266_init();
   /* USER CODE BEGIN 2 */
   
 
@@ -368,7 +345,7 @@ int main(void)
 	
 	HAL_ADCEx_Calibration_Start(&hadc1);
 	while(HAL_ADCEx_Calibration_Start(&hadc1));
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,40);
+	
 	
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receive,24);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
@@ -380,74 +357,64 @@ int main(void)
   {
     //iwdg refresh
 		//HAL_IWDG_Refresh(&hiwdg);
-
-		errorprocessing(errorcode,&currentMenuIndex);	
-	
-		//safety funtion
 		
-		if(V>=V_set)
-		{
-			cross_S=0;
-			errorcode=0x008|errorcode;
-			control();	
-		}
-		else if(0x008&errorcode)
-		{errorcode=0x008^errorcode;}
+		
+		//
+		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_RV,3);
+		
+		//浓度检测
+		ppm_processing((uint16_t)V_ppm,&errorcode);
+		
+		
+		uint16_t user_set[]={V_set,C_set,P_set,E_con_set,V_storage,P_storage};
+		//安全功能
+		errorcode=(errorcode|safefuntion(V,C,P,E_con,(uint16_t *)user_set,(((uint16_t *)user_set)+5)));
 
-		if(C>=C_set)
-		{
-			cross_S=0;
-			errorcode=0x010|errorcode;
-			control();
-		}
-		else if(0x010&errorcode)
-		{errorcode=0x010^errorcode;}
-
-		if(P>=P_set)
-		{
-			cross_S=0;
-			errorcode=0x020|errorcode;
-			control();
-		}
-		else if(0x020&errorcode)
-		{errorcode=0x020^errorcode;}
-
-		if(E_con>=E_con_set)
-		{
-			cross_S=0;
-			errorcode=0x040|errorcode;
-			control();
-		}
-		else if(0x040&errorcode)
-		{errorcode=0x040^errorcode;}
-		if(V-22>V_storage)
-		{
-			cross_S=0;
-			errorcode=0x080|errorcode;
-			control();
-		}
-		else if(0x080&errorcode)
-		{errorcode=0x080^errorcode;}
-		if(P_storage>P_set)
-		{
-			cross_S=0;
-			errorcode=0x100|errorcode;
-			control();
-		}
-		else if(0x100&errorcode)
-		{errorcode=0x100^errorcode;}
-
-		//menu funtion
+		//错误处理
+		errorprocessing(errorcode,&currentMenuIndex,&cross_user);
+		
+		//电闸通断控制
+	  switch_control(cross,cross_user,cross_t);
+		
+		//
+		T=T/10;
+		RH=RH/10;
+		//显示功能复合体
 		menuprocess();
 
 		//adc dataprocess
-		V_tem=adc_data_processing(ADC_RV,40,1,3);
-		temperature=abs(static_cast<int>(1430-V_tem))/4.3+25;
+		int16_t ADC_Receive_T=adc_data_processing(ADC_RV,1);
+		int32_t aa=1430;
+		if (ADC_Receive_T>=aa)
+		{temperature=abs((int)(ADC_Receive_T-aa))/43+25;}
+		else
+		{temperature=abs((int)(aa-ADC_Receive_T))/43+25;}
 		
-		V_ppm=adc_data_processing(ADC_RV,40,0,3);
-		V_adc=adc_data_processing(ADC_RV,40,2,3);
-		//
-		//ppm_processing(V_ppm,&errorcode);	先不启用，原因见函数体		
+		V_ppm=adc_data_processing(ADC_RV,2);
+		V_adc=adc_data_processing(ADC_RV,3);
+		//浓度处理
+		ppm_processing(V_ppm,&errorcode);	
+		
+		//结露温度计算
+		Td=Dew_point_temperature(temperature,RH);
+		
+		expand a;
+		a.Transmit=uart;
+		URTP.expandinit(&a);
+		
+		URTP.expanddata(dat,re,&V_set,&P_set,&C_set,&E_con_set);
+		
+		//sht30
+		uint8_t recv_dat[6] = {0};
+		SHT30_reset();
+		SHT30_Init();
+		HAL_Delay(100);
+		if(SHT30_Read_Dat(recv_dat) == HAL_OK)
+        {
+					HAL_Delay(10);
+					SHT30_Dat_To_Float(recv_dat, (float *)&T, (float *)&RH);
+				}
+				
   }
   /* USER CODE END 3 */
 }

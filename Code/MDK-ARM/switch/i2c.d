@@ -1,4 +1,4 @@
-switch\i2c.o: ../Src/i2c.c
+switch\i2c.o: ..\Src\i2c.c
 switch\i2c.o: ../Inc/i2c.h
 switch\i2c.o: ../Inc/main.h
 switch\i2c.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h

@@ -1,4 +1,4 @@
-switch\stm32f1xx_hal_can.o: ..\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_can.c
+switch\stm32f1xx_hal_can.o: ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c
 switch\stm32f1xx_hal_can.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 switch\stm32f1xx_hal_can.o: ../Inc/stm32f1xx_hal_conf.h
 switch\stm32f1xx_hal_can.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h

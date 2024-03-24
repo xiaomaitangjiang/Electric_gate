@@ -1,4 +1,4 @@
-switch\tim.o: ../Src/tim.c
+switch\tim.o: ..\Src\tim.c
 switch\tim.o: ../Inc/tim.h
 switch\tim.o: ../Inc/main.h
 switch\tim.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h

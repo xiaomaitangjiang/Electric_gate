@@ -29,8 +29,9 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 
 #include "stm32f1xx_hal.h"
-extern DMA_HandleTypeDef hdma_usart1_rx;
+	
 
+	
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
@@ -39,7 +40,10 @@ extern DMA_HandleTypeDef hdma_usart1_rx;
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+	
+extern DMA_HandleTypeDef hdma_usart1_rx;
+extern DMA_HandleTypeDef hdma_usart3_rx;
+	
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -57,7 +61,6 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void delay_us(uint16_t us);
-uint8_t errorprocessing (uint16_t errortype,uint16_t * index);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -92,5 +95,9 @@ uint8_t errorprocessing (uint16_t errortype,uint16_t * index);
 #ifdef __cplusplus
 }
 #endif
+
+
+
+
 
 #endif /* __MAIN_H */

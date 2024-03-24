@@ -1,4 +1,4 @@
-switch\gpio.o: ../Src/gpio.c
+switch\gpio.o: ..\Src\gpio.c
 switch\gpio.o: ../Inc/gpio.h
 switch\gpio.o: ../Inc/main.h
 switch\gpio.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h

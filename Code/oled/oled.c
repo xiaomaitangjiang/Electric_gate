@@ -205,7 +205,7 @@ void OLED_ShowChar(uint8_t x,uint8_t y,uint8_t chr,uint8_t Char_Size,uint8_t Col
  * @param {uint8_t} Color_Turn是否反相显示(1反相、0不反相)
  * @return {*}
  */
-void OLED_ShowString(uint8_t x,uint8_t y,char*chr,uint8_t Char_Size, uint8_t Color_Turn)
+void OLED_ShowString(uint8_t x,uint8_t y,const char*chr,uint8_t Char_Size, uint8_t Color_Turn)
 {
 	uint8_t  j=0;
 	while (chr[j]!='\0')

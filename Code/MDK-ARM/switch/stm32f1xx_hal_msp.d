@@ -1,4 +1,4 @@
-switch\stm32f1xx_hal_msp.o: ../Src/stm32f1xx_hal_msp.c
+switch\stm32f1xx_hal_msp.o: ..\Src\stm32f1xx_hal_msp.c
 switch\stm32f1xx_hal_msp.o: ../Inc/main.h
 switch\stm32f1xx_hal_msp.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 switch\stm32f1xx_hal_msp.o: ../Inc/stm32f1xx_hal_conf.h

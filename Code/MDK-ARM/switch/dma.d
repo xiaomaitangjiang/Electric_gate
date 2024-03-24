@@ -1,4 +1,4 @@
-switch\dma.o: ../Src/dma.c
+switch\dma.o: ..\Src\dma.c
 switch\dma.o: ../Inc/dma.h
 switch\dma.o: ../Inc/main.h
 switch\dma.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h

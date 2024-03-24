@@ -1,4 +1,4 @@
-switch\rtc.o: ../Src/rtc.c
+switch\rtc.o: ..\Src\rtc.c
 switch\rtc.o: ../Inc/rtc.h
 switch\rtc.o: ../Inc/main.h
 switch\rtc.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h

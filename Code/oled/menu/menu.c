@@ -1,5 +1,13 @@
 #include "menu.h"
 
+/*
+waring
+不要随意修改或重构
+除非具有完美方案
+（写的很烂）
+*/
+
+
 //page,line,left,right,enter
 menu menulist[]=
 {
@@ -262,11 +270,16 @@ void page4(int index)
 	OLED_ShowCHinese(13,4,50,0);//结
 	OLED_ShowCHinese(25,4,51,0);//露
 	OLED_ShowCHinese(37,4,47,0);//温
-	OLED_ShowCHinese(49,4,48,0);//度	
-	OLED_ShowNum(86,0, 25 ,5,12,0);/*湿度*/
-	OLED_ShowNum(86,2, temperature ,5,12,0);/*温度*/
-	OLED_ShowNum(86,4, 14 ,2,12,0);	/*结露温度*/
-
+	OLED_ShowCHinese(49,4,48,0);//度
+		
+	OLED_ShowCHinese(13,6,68,0);//外
+	OLED_ShowCHinese(25,6,69,0);//部
+	OLED_ShowCHinese(37,6,47,0);//温
+	OLED_ShowCHinese(49,6,48,0);//度	
+	OLED_ShowNum(86,0, RH ,2,12,0);/*湿度*/
+	OLED_ShowNum(86,2, temperature ,2,12,0);/*温度*/
+	OLED_ShowNum(86,4, Td ,2,12,0);	/*结露温度*/
+	OLED_ShowNum(86,6, T ,2,12,0);	/*结露温度*/
 	}
 }		
 
@@ -366,14 +379,14 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 							if(currentMenuIndex==0)
 							{
 								HAL_Delay(10); // 消抖延时
-								if(cross_C==0)
+								if(cross_user==0)
 								{
-									cross_C=1;
+									cross_user=1;
 									enter=0;
 								}
-								else if(cross_C==1)
+								else if(cross_user==1)
 								{
-									cross_C=0;
+									cross_user=0;
 									enter=0;
 								}
 								
@@ -629,18 +642,18 @@ else if (caring==1&&key1State == GPIO_PIN_RESET && key2State == GPIO_PIN_RESET  
 						HAL_Delay(1);
 						if(caring==0)
 						{
-	          page0(currentMenuIndex,cross_C);
+	          page0(currentMenuIndex,cross_user);
             page1(currentMenuIndex,lineindex,enter);
 	          page2(currentMenuIndex,lineindex,enter);
-						page3(currentMenuIndex,errorprocessing(errorcode,&currentMenuIndex));
+						page3(currentMenuIndex,errorprocessing(errorcode,&currentMenuIndex,&cross_user));
 						page4(currentMenuIndex);
 						page5(currentMenuIndex);
 					  }
 						else if (caring==1)
 						{
-							 page0(currentMenuIndex,cross_C);
+							 page0(currentMenuIndex,cross_user);
                page1(currentMenuIndex,lineindex,enter);
-							 page3(currentMenuIndex,errorprocessing(errorcode,&currentMenuIndex));
+							 page3(currentMenuIndex,errorprocessing(errorcode,&currentMenuIndex,&cross_user));
 							 page4(currentMenuIndex);
 							
 							

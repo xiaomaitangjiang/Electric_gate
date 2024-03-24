@@ -1,4 +1,4 @@
-switch\usart.o: ../Src/usart.c
+switch\usart.o: ..\Src\usart.c
 switch\usart.o: ../Inc/usart.h
 switch\usart.o: ../Inc/main.h
 switch\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h

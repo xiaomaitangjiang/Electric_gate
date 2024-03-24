@@ -1,4 +1,4 @@
-switch\main.o: ../Src/main.c
+switch\main.o: ..\Src\main.c
 switch\main.o: ../Inc/main.h
 switch\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 switch\main.o: ../Inc/stm32f1xx_hal_conf.h
@@ -45,8 +45,38 @@ switch\main.o: ../Inc/rtc.h
 switch\main.o: ../Inc/tim.h
 switch\main.o: ../Inc/usart.h
 switch\main.o: ../Inc/gpio.h
-switch\main.o: ../oled/oled.h
-switch\main.o: ../oled/oledfont.h
+switch\main.o: ..\oled\oled.h
+switch\main.o: ..\oled\oledfont.h
 switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 switch\main.o: ..\oled\menu\menu.h
+switch\main.o: ..\funtion\funtion.hpp
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\vector
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\limits
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_defs.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_config.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/config.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_math.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cmath
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cfloat
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\float.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\climits
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\memory
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\new
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\exception
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\utility
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_iterbase.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cstddef
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_mutex.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\cstring
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_algobase.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_iterator.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_dispatch.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\rw/_error.h
+switch\main.o: ..\Universal Receiver Transmitter\process.hpp
 switch\main.o: ../Inc/can.h
+switch\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+switch\main.o: ..\Universal Receiver Transmitter\enum define\typeport.h
+switch\main.o: ..\net\esp8266.h
+switch\main.o: ..\sht30\SHT3x.h

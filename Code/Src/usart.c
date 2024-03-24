@@ -21,7 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V1,double * C1,double * P1,double * E_con1)
+uint8_t HLW8032_Data_processing(uint8_t *rxBuffer1,double * V1,double * C1,double * P1,double * E_con1)
 {
 	uint32_t VP_REG=0,V_REG=0,CP_REG=0,C_REG=0,PP_REG=0,P_REG=0,PF_COUNT=0,PF=0,dat_sum=0;
   uint8_t i=0;
@@ -29,25 +29,25 @@ uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V1,double * C1,do
   uint16_t old_reg=0;
 	int error =0x000;
 	
-	if(rxBuffer1[0]!=0xaa)//芯片误差修正功能正常，参数正常
+	if(*rxBuffer1!=0xaa)//芯片误差修正功能正常，参数正常
 	{
 		for(i=2;i<23;i++)
 		{
-			dat_sum=dat_sum+rxBuffer1[i];//计算校验和
+			dat_sum=dat_sum+*(rxBuffer1+2);//计算校验和
 		}
-		if(dat_sum%256==rxBuffer1[23])//检查校验位是否正确
+		if(dat_sum%256==*(rxBuffer1+23))//检查校验位是否正确
 		{
-			VP_REG=rxBuffer1[2]*65536+rxBuffer1[3]*256+rxBuffer1[4];//计算电压参数寄存器
-			V_REG=rxBuffer1[5]*65536+rxBuffer1[6]*256+rxBuffer1[7];//计算电压寄存器
+			VP_REG=*(rxBuffer1+2)*65536+*(rxBuffer1+3)*256+*(rxBuffer1+4);//计算电压参数寄存器
+			V_REG=*(rxBuffer1+5)*65536+*(rxBuffer1+6)*256+*(rxBuffer1+7);//计算电压寄存器
 			*V1 =(VP_REG/V_REG)*3.006;//计算电压值，1.88为电压系数，根据所采用的分压电阻大小来确定
 			
-			CP_REG=rxBuffer1[8]*65536+rxBuffer1[9]*256+rxBuffer1[10];//计算电流参数寄存器
-			C_REG=rxBuffer1[11]*65536+rxBuffer1[12]*256+rxBuffer1[13];//计算电流寄存器
+			CP_REG=*(rxBuffer1+8)*65536+*(rxBuffer1+9)*256+*(rxBuffer1+10);//计算电流参数寄存器
+			C_REG=*(rxBuffer1+11)*65536+*(rxBuffer1+12)*256+*(rxBuffer1+13);//计算电流寄存器
 			*C1 =CP_REG/C_REG;//计算电流值
 			
-			if(rxBuffer1[0]>0xf0 )//判断实时功率是否未溢出
+			if((*rxBuffer1)>0xf0 )//判断实时功率是否未溢出
 			{
-				if(rxBuffer1[0]==0xf1)
+				if((*rxBuffer1)==0xf1)
 				{
 					error=0x001;
 				}
@@ -56,24 +56,24 @@ uint8_t HLW8032_Data_processing(uint8_t rxBuffer1[24],double * V1,double * C1,do
 			}
 			else
 			{
-				PP_REG=rxBuffer1[14]*65536+rxBuffer1[15]*256+rxBuffer1[16];//计算功率参数寄存
-				P_REG=rxBuffer1[17]*65536+rxBuffer1[18]*256+rxBuffer1[19];//计算功率寄存器
+				PP_REG=(*(rxBuffer1+14))*65536+(*(rxBuffer1+15))*256+(*(rxBuffer1+16));//计算功率参数寄存
+				P_REG=(*(rxBuffer1+17))*65536+(*(rxBuffer1+18))*256+(*(rxBuffer1+19));//计算功率寄存器
 				*P1=(PP_REG/P_REG)*3.006;//计算有效功率
 				
 			}	
-			if((rxBuffer1[20]&0x80)!=old_reg)//判断数据更新寄存器最高位有没有翻转
+			if((*(rxBuffer1+20)&0x80)!=old_reg)//判断数据更新寄存器最高位有没有翻转
 			{
 				k++;
-				old_reg=rxBuffer1[20]&0x80;
+				old_reg=*(rxBuffer1+20)&0x80;
 			}
-			PF=(k*65536)+(rxBuffer1[21]*256)+rxBuffer1[22];//计算已用电量脉冲数
+			PF=(k*65536)+((*(rxBuffer1+21))*256)+*(rxBuffer1+22);//计算已用电量脉冲数
 			PF_COUNT= 3600000000000/(PP_REG*3.006);//计算1度电对应的脉冲数量
 			*E_con1=((PF*10000)/PF_COUNT)/10000.0;//计算已用电量
 		}	
 	}
 	//屏幕驱动函数
 	
-	else if (rxBuffer1[0]==0xaa)
+	else if (*rxBuffer1==0xaa)
 	{
 		error=error|0x002;
 	
@@ -87,6 +87,7 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart3_rx;
 
 /* USART1 init function */
 
@@ -277,6 +278,26 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+    /* USART3 DMA Init */
+    /* USART3_RX Init */
+    hdma_usart3_rx.Instance = DMA1_Channel3;
+    hdma_usart3_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_usart3_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_usart3_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_usart3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_usart3_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_usart3_rx.Init.Mode = DMA_NORMAL;
+    hdma_usart3_rx.Init.Priority = DMA_PRIORITY_LOW;
+    if (HAL_DMA_Init(&hdma_usart3_rx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(uartHandle,hdmarx,hdma_usart3_rx);
+
+    /* USART3 interrupt Init */
+    HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART3_IRQn);
   /* USER CODE BEGIN USART3_MspInit 1 */
 
   /* USER CODE END USART3_MspInit 1 */
@@ -341,6 +362,11 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     */
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10|GPIO_PIN_11);
 
+    /* USART3 DMA DeInit */
+    HAL_DMA_DeInit(uartHandle->hdmarx);
+
+    /* USART3 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART3_IRQn);
   /* USER CODE BEGIN USART3_MspDeInit 1 */
 
   /* USER CODE END USART3_MspDeInit 1 */

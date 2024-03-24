@@ -1,4 +1,4 @@
-switch\adc.o: ../Src/adc.c
+switch\adc.o: ..\Src\adc.c
 switch\adc.o: ../Inc/adc.h
 switch\adc.o: ../Inc/main.h
 switch\adc.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
